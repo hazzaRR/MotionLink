@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:BaseContentPage
+    xmlns:views="clr-namespace:MotionLink.Views"
+     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MotionLink.Views.PeripheralConnectView"
+             x:Name="thisPage"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit">
+
+
+<views:BaseContentPage.Resources>
+    <ResourceDictionary>
+        <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+        <toolkit:IsEqualConverter x:Key="IsEqualConverter" />
+        <converters:GuidEqualityConverter x:Key="IdComparer" />
+    </ResourceDictionary>
+</views:BaseContentPage.Resources>
+
+
+    <VerticalStackLayout Padding="10" Margin="5">
+        <Label 
+            Text="Welcome to Peripheral Connect"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center" />
+
+        <Button Text="Start Scan"
+                Command="{Binding StartScanCommand}"
+                IsVisible="{Binding IsScanning,Converter={StaticResource InvertedBoolConverter}}" />
+        <Button Text="Stop Scan"
+                Command="{Binding StopScanCommand}"
+                IsVisible="{Binding IsScanning}" />
+
+        <CollectionView ItemsSource="{Binding Devices}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Padding="10" Margin="5">
+                        <Border.Stroke>Gray</Border.Stroke>
+
+                        <Border.Triggers>
+                            <!-- <DataTrigger TargetType="Border" 
+                                        Binding="{Binding IsDeviceConnected}" 
+                                        Value="True">
+                                <Setter Property="BackgroundColor" Value="#2000FF00" />
+                                <Setter Property="Stroke" Value="Green" />
+                            </DataTrigger> -->
+                            <DataTrigger TargetType="Border"
+                                Binding="{Binding IsDeviceConnected}"
+                                        Value="True">
+                                <Setter Property="BackgroundColor" Value="#2000FF00" />
+                                <Setter Property="Stroke" Value="Green" />
+                            </DataTrigger>
+
+                        </Border.Triggers>
+                        <VerticalStackLayout>
+                            <Label Text="{Binding Name}" />
+                            <Label Text="{Binding Uuid}" FontSize="10" />
+                            <!-- <Button Text="Connect"
+                                    Command="{Binding BindingContext.ConnectCommand, Source={x:Reference thisPage}}"
+                                    CommandParameter="{Binding .}" /> -->
+                        <Button Text="Connect"
+                            IsVisible="{Binding IsDeviceConnected, Converter={StaticResource InvertedBoolConverter}}"
+                            Command="{Binding BindingContext.ConnectCommand, Source={x:Reference thisPage}}"
+                            CommandParameter="{Binding .}" />
+
+                    <Button Text="Disconnect"
+                            IsVisible="{Binding IsDeviceConnected}"
+                            Command="{Binding BindingContext.DisconnectCommand, Source={x:Reference thisPage}}"
+                            CommandParameter="{Binding .}" />
+
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </VerticalStackLayout>
+
+</views:BaseContentPage>
