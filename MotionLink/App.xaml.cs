@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using MotionLink.Views;
 
 namespace MotionLink
 {

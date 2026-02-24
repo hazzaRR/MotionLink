@@ -2,13 +2,24 @@
 <views:BaseContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:MotionLink.Views"
-             x:Class="MotionLink.Views.SensorDisplayView">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome Sensor display"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+             x:Class="MotionLink.Views.SensorDisplayView"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit">
 
-            <Button Text="Start Scan"/>
+<views:BaseContentPage.Resources>
+    <ResourceDictionary>
+        <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+    </ResourceDictionary>
+</views:BaseContentPage.Resources>
+
+<VerticalStackLayout>
+    <VerticalStackLayout HorizontalOptions="Center" Padding="10" Margin="10" IsVisible="{Binding BleService.IsConnected, Converter={StaticResource InvertedBoolConverter}}">
+        <Label HorizontalOptions="Center" Text="No device is currently connected" />
+
+        <Button Text="Find Device" Command="{Binding NavigateToConnectCommand}" />
+
     </VerticalStackLayout>
+    <VerticalStackLayout HorizontalOptions="Center" Padding="10" Margin="10" IsVisible="{Binding BleService.IsConnected}">
+        <Label Text="{Binding BleService.ConnectedPeripheral.Uuid}" FontSize="10" />
+    </VerticalStackLayout>
+</VerticalStackLayout>
 </views:BaseContentPage>

@@ -38,6 +38,7 @@ public partial class BleService : ObservableObject, IBleService
             if (status == ConnectionState.Disconnected)
             {
                 ConnectedPeripheral = null;
+                 OnPropertyChanged(nameof(IsConnected));
             }
         });
     }

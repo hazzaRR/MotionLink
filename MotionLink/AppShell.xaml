@@ -8,17 +8,14 @@
     Title="MotionLink">
 
     <TabBar>
-        <Tab Title="Connect">
+        <Tab Title="Connect" Icon="bluetooth.png">
             <ShellContent
                 ContentTemplate="{DataTemplate views:PeripheralConnectView}" />
         </Tab>
-        <Tab Title="Analysis" >
+        <Tab Title="Analysis" Icon="chart_line.png">
             <ShellContent
                 ContentTemplate="{DataTemplate views:SensorDisplayView}" />
         </Tab>
     </TabBar>
-
-
-        
 
 </Shell>

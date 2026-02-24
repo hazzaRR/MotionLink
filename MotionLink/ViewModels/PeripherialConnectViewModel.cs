@@ -10,7 +10,8 @@ namespace MotionLink.ViewModels;
 public partial class PeripheralConnectViewModel : BaseViewModel
 {
 
-    public IBleService BleService;
+    [ObservableProperty]
+    private IBleService _bleService;
     public IDisposable? scanSub;
 
     [ObservableProperty]
@@ -23,7 +24,7 @@ public partial class PeripheralConnectViewModel : BaseViewModel
 
     public PeripheralConnectViewModel(IBleService bleService)
     {
-        BleService = bleService;
+        _bleService = bleService;
     }
 
     
@@ -65,11 +66,19 @@ public partial class PeripheralConnectViewModel : BaseViewModel
 
         try 
         {
-            await peripheral.ConnectAsync();
+            await BleService.ConnectAsync(peripheral);
+            StopScan();
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"Failed to connect to device with uuid: {peripheral.Uuid}, {ex}");
         }
+    }
+
+    [RelayCommand]
+    void Disconnect()
+    {
+        BleService.DisconnectDevice();
     }
 
     

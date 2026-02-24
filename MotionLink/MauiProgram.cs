@@ -24,7 +24,7 @@ namespace MotionLink
             // .RegisterRepositories()
             .RegisterServices()
             .RegisterViewModels()
-            .RegisterViews();;
+            .RegisterViews();
 
 #if DEBUG
     		builder.Logging.AddDebug();
@@ -51,27 +51,28 @@ namespace MotionLink
     //     return builder;
     // }
 
-    private static MauiAppBuilder RegisterServices(this MauiAppBuilder builder)
-    {
-        builder.Services.AddScoped<IBleService, BleService>();
-        builder.Services.AddBluetoothLE();
+        private static MauiAppBuilder RegisterServices(this MauiAppBuilder builder)
+        {
+            builder.Services.AddSingleton<IBleService, BleService>();
+            builder.Services.AddBluetoothLE();
 
-        return builder;
-    }
+            return builder;
+        }
 
-    private static MauiAppBuilder RegisterViewModels(this MauiAppBuilder builder)
-    {
-        builder.Services.AddSingleton<PeripheralConnectViewModel>();
-        
-        return builder;
-    }
+        private static MauiAppBuilder RegisterViewModels(this MauiAppBuilder builder)
+        {
+            builder.Services.AddSingleton<PeripheralConnectViewModel>();
+            builder.Services.AddScoped<SensorDisplayViewModel>();
+            
+            return builder;
+        }
 
-    private static MauiAppBuilder RegisterViews(this MauiAppBuilder builder)
-    {
-        builder.Services.AddSingleton<PeripheralConnectView>();
-        builder.Services.AddScoped<SensorDisplayView>();
-        
-        return builder;
-    }
+        private static MauiAppBuilder RegisterViews(this MauiAppBuilder builder)
+        {
+            builder.Services.AddScoped<PeripheralConnectView>();
+            builder.Services.AddScoped<SensorDisplayView>();
+            
+            return builder;
+        }
     }
 }
