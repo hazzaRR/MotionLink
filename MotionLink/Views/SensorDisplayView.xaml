@@ -20,6 +20,15 @@
     </VerticalStackLayout>
     <VerticalStackLayout HorizontalOptions="Center" Padding="10" Margin="10" IsVisible="{Binding BleService.IsConnected}">
         <Label Text="{Binding BleService.ConnectedPeripheral.Uuid}" FontSize="10" />
+        <Label Text="{Binding BleService.LastValue.Ax}" IsVisible="{Binding IsCapturing}" FontSize="10" />
+        <Label Text="{Binding BleService.LastValue.Ay}" IsVisible="{Binding IsCapturing}" FontSize="10" />
+        <Label Text="{Binding BleService.LastValue.Az}" IsVisible="{Binding IsCapturing}" FontSize="10" />
+        <Label Text="{Binding BleService.LastValue.Gx}" IsVisible="{Binding IsCapturing}" FontSize="10" />
+        <Label Text="{Binding BleService.LastValue.Gy}" IsVisible="{Binding IsCapturing}" FontSize="10" />
+        <Label Text="{Binding BleService.LastValue.Gz}" IsVisible="{Binding IsCapturing}" FontSize="10" />
+        <!-- <Label Text="{Binding BleService.LastValueArray}" IsVisible="{Binding IsCapturing}" FontSize="10" /> -->
+        <Button Text="Start Capturing" Command="{Binding CaptureDataCommand}"  IsVisible="{Binding IsCapturing, Converter={StaticResource InvertedBoolConverter}}"  />
+        <Button Text="Stop Capturing" Command="{Binding PauseDataCommand}"  IsVisible="{Binding IsCapturing}"  />
     </VerticalStackLayout>
 </VerticalStackLayout>
 </views:BaseContentPage>
