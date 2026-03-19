@@ -3,32 +3,85 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:MotionLink.Views"
              x:Class="MotionLink.Views.SensorDisplayView"
-             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit">
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:chart="clr-namespace:Syncfusion.Maui.Toolkit.Charts;assembly=Syncfusion.Maui.Toolkit">
 
 <views:BaseContentPage.Resources>
     <ResourceDictionary>
         <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
     </ResourceDictionary>
 </views:BaseContentPage.Resources>
+<ScrollView Margin="20">
+    <VerticalStackLayout>
+        <VerticalStackLayout HorizontalOptions="Center" Padding="10" Margin="10" IsVisible="{Binding BleService.IsConnected, Converter={StaticResource InvertedBoolConverter}}">
+            <Label HorizontalOptions="Center" Text="No device is currently connected" />
 
-<VerticalStackLayout>
-    <VerticalStackLayout HorizontalOptions="Center" Padding="10" Margin="10" IsVisible="{Binding BleService.IsConnected, Converter={StaticResource InvertedBoolConverter}}">
-        <Label HorizontalOptions="Center" Text="No device is currently connected" />
+            <Button Text="Find Device" Command="{Binding NavigateToConnectCommand}" />
 
-        <Button Text="Find Device" Command="{Binding NavigateToConnectCommand}" />
+        </VerticalStackLayout>
+        <VerticalStackLayout HorizontalOptions="Center" Padding="10" Margin="10" IsVisible="{Binding BleService.IsConnected}">
+            <Label Text="{Binding BleService.ConnectedPeripheral.Uuid}" FontSize="10" />
+            <Label Text="{Binding BleService.LastValue.Ax}" IsVisible="{Binding IsCapturing}" FontSize="10" />
+            <Label Text="{Binding BleService.LastValue.Ay}" IsVisible="{Binding IsCapturing}" FontSize="10" />
+            <Label Text="{Binding BleService.LastValue.Az}" IsVisible="{Binding IsCapturing}" FontSize="10" />
+            <Label Text="{Binding BleService.LastValue.Gx}" IsVisible="{Binding IsCapturing}" FontSize="10" />
+            <Label Text="{Binding BleService.LastValue.Gy}" IsVisible="{Binding IsCapturing}" FontSize="10" />
+            <Label Text="{Binding BleService.LastValue.Gz}" IsVisible="{Binding IsCapturing}" FontSize="10" />
+            <!-- <Label Text="{Binding BleService.LastValueArray}" IsVisible="{Binding IsCapturing}" FontSize="10" /> -->
 
+            <!-- <chart:SfCartesianChart Title="Real-time Accelerometer" IsVisible="{Binding IsCapturing}">
+                <chart:SfCartesianChart.XAxes>
+                    <chart:CategoryAxis Title="Last 10 Seconds" 
+                                ShowMajorGridLines="False" 
+                                LabelPlacement="BetweenTicks" />
+                </chart:SfCartesianChart.XAxes>
+
+                <chart:SfCartesianChart.YAxes>
+                    <chart:NumericalAxis Title="G-Force" Maximum="20" Minimum="-20" />
+                </chart:SfCartesianChart.YAxes>
+
+                <chart:LineSeries ItemsSource="{Binding BleService.ChartData}"
+                                XBindingPath="Index" 
+                                YBindingPath="Ax"
+                                Label="X-Axis" />
+                
+                <chart:LineSeries ItemsSource="{Binding BleService.ChartData}"
+                                XBindingPath="Index" 
+                                YBindingPath="Ay"
+                                Label="Y-Axis" />
+                <chart:LineSeries ItemsSource="{Binding BleService.ChartData}"
+                                XBindingPath="Index" 
+                                YBindingPath="Az"
+                                Label="Z-Axis" />
+            </chart:SfCartesianChart> -->
+            <!-- <chart:SfCartesianChart Title="Real-time Gyroscope" IsVisible="{Binding IsCapturing}">
+                <chart:SfCartesianChart.XAxes>
+                    <chart:CategoryAxis Title="Last 10 Seconds" 
+                                ShowMajorGridLines="False" 
+                                LabelPlacement="BetweenTicks" />
+                </chart:SfCartesianChart.XAxes>
+
+                <chart:SfCartesianChart.YAxes>
+                    <chart:NumericalAxis Title="G-Force" Maximum="20" Minimum="-20" />
+                </chart:SfCartesianChart.YAxes>
+
+                <chart:LineSeries ItemsSource="{Binding BleService.ChartData}"
+                                XBindingPath="Index" 
+                                YBindingPath="Gx"
+                                Label="X-Axis" />
+                
+                <chart:LineSeries ItemsSource="{Binding BleService.ChartData}"
+                                XBindingPath="Index" 
+                                YBindingPath="Gy"
+                                Label="Y-Axis" />
+                <chart:LineSeries ItemsSource="{Binding BleService.ChartData}"
+                                XBindingPath="Index" 
+                                YBindingPath="Gz"
+                                Label="Z-Axis" />
+            </chart:SfCartesianChart> -->
+            <Button Text="Start Capturing" Command="{Binding CaptureDataCommand}"  IsVisible="{Binding IsCapturing, Converter={StaticResource InvertedBoolConverter}}"  />
+            <Button Text="Stop Capturing" Command="{Binding PauseDataCommand}"  IsVisible="{Binding IsCapturing}"  />
+        </VerticalStackLayout>
     </VerticalStackLayout>
-    <VerticalStackLayout HorizontalOptions="Center" Padding="10" Margin="10" IsVisible="{Binding BleService.IsConnected}">
-        <Label Text="{Binding BleService.ConnectedPeripheral.Uuid}" FontSize="10" />
-        <Label Text="{Binding BleService.LastValue.Ax}" IsVisible="{Binding IsCapturing}" FontSize="10" />
-        <Label Text="{Binding BleService.LastValue.Ay}" IsVisible="{Binding IsCapturing}" FontSize="10" />
-        <Label Text="{Binding BleService.LastValue.Az}" IsVisible="{Binding IsCapturing}" FontSize="10" />
-        <Label Text="{Binding BleService.LastValue.Gx}" IsVisible="{Binding IsCapturing}" FontSize="10" />
-        <Label Text="{Binding BleService.LastValue.Gy}" IsVisible="{Binding IsCapturing}" FontSize="10" />
-        <Label Text="{Binding BleService.LastValue.Gz}" IsVisible="{Binding IsCapturing}" FontSize="10" />
-        <!-- <Label Text="{Binding BleService.LastValueArray}" IsVisible="{Binding IsCapturing}" FontSize="10" /> -->
-        <Button Text="Start Capturing" Command="{Binding CaptureDataCommand}"  IsVisible="{Binding IsCapturing, Converter={StaticResource InvertedBoolConverter}}"  />
-        <Button Text="Stop Capturing" Command="{Binding PauseDataCommand}"  IsVisible="{Binding IsCapturing}"  />
-    </VerticalStackLayout>
-</VerticalStackLayout>
+</ScrollView>
 </views:BaseContentPage>

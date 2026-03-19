@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Reactive.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
@@ -11,7 +12,12 @@ namespace MotionLink.Services;
 public partial class BleService : ObservableObject, IBleService
 {
     private readonly ILogger<BleService> _logger;
+    private int _packetCount = 0;
     private readonly IBleManager _bleManager;
+
+    [ObservableProperty]
+    private ObservableCollection<ROMPacket> _chartData = new();
+    private List<ROMPacket> _internalBuffer = new();
 
     [ObservableProperty]
     private ROMPacket _lastValue;
@@ -57,11 +63,12 @@ public partial class BleService : ObservableObject, IBleService
         .Subscribe(data =>
         {
             _logger.LogInformation($"{data.Data.Length}");
-
             _logger.LogInformation(BitConverter.ToString(data.Data));
             
            ROMPacket packet = new ROMPacket
             {
+                Index = _packetCount++,
+                TimeStamp = DateTimeOffset.Now,
                 Ax = BitConverter.ToSingle(data.Data, 0),
                 Ay = BitConverter.ToSingle(data.Data, 4),
                 Az = BitConverter.ToSingle(data.Data, 8),
@@ -70,10 +77,23 @@ public partial class BleService : ObservableObject, IBleService
                 Gz = BitConverter.ToSingle(data.Data, 20)
             };
 
-            MainThread.BeginInvokeOnMainThread(() =>
+            _internalBuffer.Add(packet);
+
+            if (_internalBuffer.Count >= 5)
             {
-                LastValue = packet;
-            });
+                var batch = _internalBuffer.ToList();
+                _internalBuffer.Clear();
+
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    LastValue = packet;
+                    foreach (var p in batch)
+                    {
+                        ChartData.Add(p);
+                        if (ChartData.Count > 200) ChartData.RemoveAt(0);
+                    }
+                });
+            }
         });
         
     }

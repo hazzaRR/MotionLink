@@ -4,6 +4,9 @@ using MotionLink.Services;
 using MotionLink.ViewModels;
 using MotionLink.Views;
 using Shiny;
+using Syncfusion.Maui.Toolkit.Hosting;
+using LiveChartsCore.SkiaSharpView.Maui;
+using SkiaSharp.Views.Maui.Controls.Hosting;
 
 namespace MotionLink
 {
@@ -14,6 +17,9 @@ namespace MotionLink
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                // .ConfigureSyncfusionToolkit()
+                .UseSkiaSharp() 
+                .UseLiveCharts() 
                 .UseMauiCommunityToolkit()
                 .UseShiny()
                 .ConfigureFonts(fonts =>
