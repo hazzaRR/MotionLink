@@ -1,8 +1,6 @@
 namespace MotionLink.Models;
 public class ROMPacket
-{
-    public int Index {get; set; }
-    public DateTimeOffset TimeStamp {get; set; }
+{    public DateTimeOffset TimeStamp {get; set; }
     public float Ax {get; set; }
     public float Ay {get; set; }
     public float Az {get; set; }

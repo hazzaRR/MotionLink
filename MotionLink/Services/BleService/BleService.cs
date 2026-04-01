@@ -1,10 +1,14 @@
 using System.Collections.ObjectModel;
 using System.Reactive.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.SkiaSharpView.Painting;
 using Microsoft.Extensions.Logging;
 using MotionLink.Models;
 using Shiny;
 using Shiny.BluetoothLE;
+using SkiaSharp;
 
 
 namespace MotionLink.Services;
@@ -12,24 +16,46 @@ namespace MotionLink.Services;
 public partial class BleService : ObservableObject, IBleService
 {
     private readonly ILogger<BleService> _logger;
-    private int _packetCount = 0;
     private readonly IBleManager _bleManager;
 
-    [ObservableProperty]
-    private ObservableCollection<ROMPacket> _chartData = new();
-    private List<ROMPacket> _internalBuffer = new();
-
-    [ObservableProperty]
-    private ROMPacket _lastValue;
-    private string _lastValueArray;
 
     [ObservableProperty]
     private IPeripheral? _connectedPeripheral;
     public bool IsConnected => ConnectedPeripheral != null;
+
+    [ObservableProperty]
+    private ROMPacket _lastValue;
+
+    private ObservableCollection<double> AccX { get; } = new();
+    private ObservableCollection<double> AccY { get; } = new();
+    private ObservableCollection<double> AccZ { get; } = new();
+    private ObservableCollection<double> GyroX { get; } = new();
+    private ObservableCollection<double> GyroY { get; } = new();
+    private ObservableCollection<double> GyroZ { get; } = new();
+    public ISeries[] AccelSeries { get; }
+    public ISeries[] GyroSeries { get; }
+    public object Sync { get; } = new object();
     public BleService(ILogger<BleService> logger, IBleManager bleManager)
     {
         _logger = logger;
         _bleManager = bleManager;
+        
+        AccelSeries = new ISeries[]
+        {
+
+            new LineSeries<double> { Values = AccX, Name = "Acc X", Stroke = new SolidColorPaint(SKColors.Blue) { StrokeThickness = 4 }},
+            new LineSeries<double> { Values = AccY, Name = "Acc Y", Stroke = new SolidColorPaint(SKColors.Red) { StrokeThickness = 4 }},
+            new LineSeries<double> { Values = AccZ, Name = "Acc Z", Stroke = new SolidColorPaint(SKColors.Green) { StrokeThickness = 4 }},
+
+        };
+
+        GyroSeries = new ISeries[]
+        {
+            new LineSeries<double> { Values = GyroX, Name = "Gyro X", Stroke = new SolidColorPaint(SKColors.Blue) { StrokeThickness = 4 }},
+            new LineSeries<double> { Values = GyroY, Name = "Gyro Y", Stroke = new SolidColorPaint(SKColors.Red) { StrokeThickness = 4 }},
+            new LineSeries<double> { Values = GyroZ, Name = "Gyro Z", Stroke = new SolidColorPaint(SKColors.Green) { StrokeThickness = 4 }}
+        };
+
     }
 
     public IObservable<IPeripheral> ScanForDevices(string serviceUuid)
@@ -67,7 +93,6 @@ public partial class BleService : ObservableObject, IBleService
             
            ROMPacket packet = new ROMPacket
             {
-                Index = _packetCount++,
                 TimeStamp = DateTimeOffset.Now,
                 Ax = BitConverter.ToSingle(data.Data, 0),
                 Ay = BitConverter.ToSingle(data.Data, 4),
@@ -77,26 +102,34 @@ public partial class BleService : ObservableObject, IBleService
                 Gz = BitConverter.ToSingle(data.Data, 20)
             };
 
-            _internalBuffer.Add(packet);
-
-            if (_internalBuffer.Count >= 5)
-            {
-                var batch = _internalBuffer.ToList();
-                _internalBuffer.Clear();
-
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
                     LastValue = packet;
-                    foreach (var p in batch)
-                    {
-                        ChartData.Add(p);
-                        if (ChartData.Count > 200) ChartData.RemoveAt(0);
-                    }
                 });
+
+            lock (Sync)
+            {
+                AddPoint(AccX, packet.Ax);
+                AddPoint(AccY, packet.Ay);
+                AddPoint(AccZ, packet.Az);
+
+                AddPoint(GyroX, packet.Gx);
+                AddPoint(GyroY, packet.Gy);
+                AddPoint(GyroZ, packet.Gz);
             }
+
         });
         
     }
+
+    private void AddPoint(ObservableCollection<double> list, double value)
+    {
+        list.Add(value);
+
+        if (list.Count > 200)
+            list.RemoveAt(0);
+    }
+
     public void DisconnectDevice()
     {
         ConnectedPeripheral?.CancelConnection();

@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using LiveChartsCore;
 using MotionLink.Models;
 using Shiny.BluetoothLE;
 
@@ -7,7 +8,9 @@ namespace MotionLink.Services;
 public interface IBleService
 {
     ROMPacket LastValue {get;}
-    ObservableCollection<ROMPacket> ChartData {get;}
+    ISeries[] AccelSeries { get; }
+    ISeries[] GyroSeries { get; }
+    object Sync { get; }
     IPeripheral ConnectedPeripheral {get;}
     IObservable<IPeripheral> ScanForDevices(string serviceUuid);
     Task ConnectAsync(IPeripheral peripheral);
