@@ -62,6 +62,12 @@ namespace MotionLink
             builder.Services.AddSingleton<IBleService, BleService>();
             builder.Services.AddBluetoothLE();
 
+            // builder.Services.AddHttpClient<IGatewayClient, GatewayClient>(client =>
+            // {
+            //     client.DefaultRequestHeaders.Add("Accept", "application/json");
+            //     client.DefaultRequestHeaders.Add("User-Agent", "MotionlinkDevice");
+            // });
+
             return builder;
         }
 
@@ -69,6 +75,7 @@ namespace MotionLink
         {
             builder.Services.AddSingleton<PeripheralConnectViewModel>();
             builder.Services.AddScoped<SensorDisplayViewModel>();
+            builder.Services.AddScoped<TelemetryEndpointViewModel>();
             
             return builder;
         }
@@ -77,6 +84,7 @@ namespace MotionLink
         {
             builder.Services.AddScoped<PeripheralConnectView>();
             builder.Services.AddScoped<SensorDisplayView>();
+            builder.Services.AddScoped<TelemetryEndpointView>();
             
             return builder;
         }

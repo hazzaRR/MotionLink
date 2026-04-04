@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:BaseContentPage
+    xmlns:views="clr-namespace:MotionLink.Views"
+     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MotionLink.Views.TelemetryEndpointView"
+             x:Name="telemPage"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit">
+
+
+<views:BaseContentPage.Resources>
+    <ResourceDictionary>
+        <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+    </ResourceDictionary>
+</views:BaseContentPage.Resources>
+
+
+    <VerticalStackLayout Padding="10" Margin="5">
+        <Label 
+            Text="send Data to external Url"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center" />
+
+            <Entry Text="{Binding Url}"
+                   Placeholder="Enter URL" />
+            <Button Text="Disconnect"
+            IsVisible="{Binding IsDeviceConnected}"
+            Command="{Binding BindingContext.DisconnectCommand, Source={x:Reference thisPage}}"
+            CommandParameter="{Binding BleService.ConnectedPeripheral}" />
+
+    </VerticalStackLayout>
+
+</views:BaseContentPage>

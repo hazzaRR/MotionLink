@@ -4,7 +4,7 @@
      xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MotionLink.Views.PeripheralConnectView"
-             x:Name="thisPage"
+             x:Name="perphPage"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit">
 
 
@@ -27,7 +27,7 @@
 
             <Button Text="Disconnect"
             IsVisible="{Binding IsDeviceConnected}"
-            Command="{Binding BindingContext.DisconnectCommand, Source={x:Reference thisPage}}"
+            Command="{Binding BindingContext.DisconnectCommand, Source={x:Reference perphPage}}"
             CommandParameter="{Binding BleService.ConnectedPeripheral}" />
         </VerticalStackLayout>
 
@@ -65,15 +65,15 @@
                                 <Label Text="{Binding Name}" />
                                 <Label Text="{Binding Uuid}" FontSize="10" />
                                 <!-- <Button Text="Connect"
-                                        Command="{Binding BindingContext.ConnectCommand, Source={x:Reference thisPage}}"
+                                        Command="{Binding BindingContext.ConnectCommand, Source={x:Reference perphPage}}"
                                         CommandParameter="{Binding .}" /> -->
                             <Button Text="Connect"
-                                Command="{Binding BindingContext.ConnectCommand, Source={x:Reference thisPage}}"
+                                Command="{Binding BindingContext.ConnectCommand, Source={x:Reference perphPage}}"
                                 CommandParameter="{Binding .}" />
 
                         <!-- <Button Text="Disconnect"
                                 IsVisible="{Binding IsDeviceConnected}"
-                                Command="{Binding BindingContext.DisconnectCommand, Source={x:Reference thisPage}}"
+                                Command="{Binding BindingContext.DisconnectCommand, Source={x:Reference perphPage}}"
                                 CommandParameter="{Binding .}" /> -->
 
                             </VerticalStackLayout>

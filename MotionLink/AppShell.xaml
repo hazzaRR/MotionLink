@@ -16,6 +16,10 @@
             <ShellContent
                 ContentTemplate="{DataTemplate views:SensorDisplayView}" />
         </Tab>
+        <!-- <Tab Title="Sync" Icon="chart_line.png">
+            <ShellContent
+                ContentTemplate="{DataTemplate views:TelemetryEndpointView}" />
+        </Tab> -->
     </TabBar>
 
 </Shell>
