@@ -24,10 +24,9 @@
         <ScrollView Grid.Row="1" Padding="15">
             <VerticalStackLayout Spacing="15">
 
-        <Frame IsVisible="{Binding BleService.IsConnected}"
+        <Border IsVisible="{Binding BleService.IsConnected}"
             BackgroundColor="#E8F5E9"
-            BorderColor="#4CAF50"
-            HasShadow="True"
+            Stroke="#4CAF50"
             Padding="10">
             <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="12">
 
@@ -58,7 +57,7 @@
                         VerticalOptions="Center"
                         HorizontalOptions="End" />
             </Grid>
-        </Frame>
+        </Border>
 
                 <VerticalStackLayout
                     IsVisible="{Binding BleService.IsConnected, Converter={StaticResource InvertedBoolConverter}}"
@@ -81,7 +80,7 @@
                         </CollectionView.EmptyView>
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
-                                <Frame Margin="0,5" Padding="10" HasShadow="False" BorderColor="#DDDDDD">
+                                <Border Margin="0,5" Padding="10" Stroke="#DDDDDD">
                                     <Grid ColumnDefinitions="*, Auto">
                                         <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                                             <Label Text="{Binding Name, FallbackValue='Unknown Device'}"
@@ -93,7 +92,7 @@
                                                 CommandParameter="{Binding .}"
                                                 BackgroundColor="#2196F3" HeightRequest="40" CornerRadius="20" />
                                     </Grid>
-                                </Frame>
+                                </Border>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>

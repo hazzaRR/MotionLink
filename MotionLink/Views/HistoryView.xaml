@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:BaseContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:MotionLink.Views"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="MotionLink.Views.HistoryView"
+             Title="Session History">
+    <Grid RowDefinitions="Auto, *">
+        <ScrollView Grid.Row="1" Padding="15">
+            <VerticalStackLayout Spacing="15">
+                <VerticalStackLayout Spacing="10">
+                    <CollectionView ItemsSource="{Binding Histories}" Margin="0,10">
+                        <CollectionView.EmptyView>
+                            <VerticalStackLayout HorizontalOptions="Center" Padding="40">
+                                <Label Text="No sessions yet..." HorizontalOptions="Center" TextColor="Gray" />
+                                <Button Text="Open Dashboard"
+                                        Command="{Binding NavigateToDashboardCommand}"
+                                        Margin="0,20" BackgroundColor="#4CAF50" HeightRequest="60" CornerRadius="30" />
+                            </VerticalStackLayout>
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="0,5" Padding="10" Stroke="#DDDDDD">
+                                    <Grid ColumnDefinitions="*, Auto">
+                                        <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                                            <Label Text="{Binding Name, FallbackValue='Unnamed Session'}"
+                                                   FontAttributes="Bold" />
+                                            <Label Text="{Binding DateStart}" FontSize="10" TextColor="Gray" />
+                                            <Label Text="{Binding DateEnd}" FontSize="10" TextColor="Gray" />
+                                        </VerticalStackLayout>
+                                        <!-- <Button Grid.Column="1" Text="Connect"
+                                                Command="{Binding BindingContext.ConnectCommand, Source={x:Reference perphPage}}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="#2196F3" HeightRequest="40" CornerRadius="20" /> -->
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</views:BaseContentPage>

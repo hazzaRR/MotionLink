@@ -18,6 +18,11 @@
                 Route="SensorDisplayView"
                 ContentTemplate="{DataTemplate views:SensorDisplayView}" />
         </Tab>
+        <Tab Title="History" Icon="timeline.png">
+            <ShellContent
+                Route="HistoryView"
+                ContentTemplate="{DataTemplate views:HistoryView}" />
+        </Tab>
         <!-- <Tab Title="Sync" Icon="chart_line.png">
             <ShellContent
                 ContentTemplate="{DataTemplate views:TelemetryEndpointView}" />

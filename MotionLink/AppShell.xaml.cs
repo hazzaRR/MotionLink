@@ -8,6 +8,7 @@ namespace MotionLink
         {
             Routing.RegisterRoute(nameof(PeripheralConnectView), typeof(PeripheralConnectView));
             Routing.RegisterRoute(nameof(SensorDisplayView), typeof(SensorDisplayView));
+            Routing.RegisterRoute(nameof(HistoryView), typeof(HistoryView));
             // Routing.RegisterRoute(nameof(TelemetryEndpointView), typeof(TelemetryEndpointView));
             InitializeComponent();
         }

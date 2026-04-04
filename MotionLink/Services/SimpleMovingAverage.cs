@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace MotionLink.Services;
 public class SimpleMovingAverage
 {
