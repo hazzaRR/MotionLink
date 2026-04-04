@@ -10,10 +10,12 @@
     <TabBar>
         <Tab Title="Connect" Icon="bluetooth.png">
             <ShellContent
+                Route="PeripheralConnectView"
                 ContentTemplate="{DataTemplate views:PeripheralConnectView}" />
         </Tab>
         <Tab Title="Analysis" Icon="chart_line.png">
             <ShellContent
+                Route="SensorDisplayView"
                 ContentTemplate="{DataTemplate views:SensorDisplayView}" />
         </Tab>
         <!-- <Tab Title="Sync" Icon="chart_line.png">

@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using MotionLink.Services;
 using Shiny.BluetoothLE;
 using System.Reactive.Linq;
+using MotionLink.Views;
 
 namespace MotionLink.ViewModels;
 
@@ -45,7 +46,6 @@ public partial class PeripheralConnectViewModel : BaseViewModel
                     Devices.Add(device);
             });
 
-        Console.WriteLine(Devices);
         // scanSub?.Dispose();
         // scanSub = null;
         // IsScanning = false;
@@ -81,7 +81,11 @@ public partial class PeripheralConnectViewModel : BaseViewModel
         BleService.DisconnectDevice();
     }
 
-    
+    [RelayCommand]
+    async Task NavigateToDashboard()
+    {
+        await Shell.Current.GoToAsync($"///{nameof(SensorDisplayView)}");
+    }
 
-    
+
 }

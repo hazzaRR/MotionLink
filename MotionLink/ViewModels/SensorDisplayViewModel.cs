@@ -47,9 +47,9 @@ public partial class SensorDisplayViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    void NavigateToConnect()
+    async Task NavigateToConnect()
     {
-        Shell.Current.GoToAsync(nameof(PeripheralConnectView));
+        await Shell.Current.GoToAsync($"///{nameof(PeripheralConnectView)}");
     }
 
 

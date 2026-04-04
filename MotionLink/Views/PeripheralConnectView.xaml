@@ -1,90 +1,110 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
+
 <views:BaseContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:views="clr-namespace:MotionLink.Views"
-     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="MotionLink.Views.PeripheralConnectView"
-             x:Name="perphPage"
-             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit">
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    x:Class="MotionLink.Views.PeripheralConnectView"
+    x:Name="perphPage"
+    Title="Setup Sensor">
 
-
-<views:BaseContentPage.Resources>
-    <ResourceDictionary>
+    <views:BaseContentPage.Resources>
         <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
-    </ResourceDictionary>
-</views:BaseContentPage.Resources>
+    </views:BaseContentPage.Resources>
 
-
-    <VerticalStackLayout Padding="10" Margin="5">
-        <Label 
-            Text="Welcome to Peripheral Connect"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-
-        <VerticalStackLayout IsVisible="{Binding BleService.IsConnected}" Padding="10" Margin="10">
-            <Label Text="{Binding BleService.ConnectedPeripheral.Name}"/>
-            <Label Text="{Binding BleService.ConnectedPeripheral.Uuid}"/>
-
-            <Button Text="Disconnect"
-            IsVisible="{Binding IsDeviceConnected}"
-            Command="{Binding BindingContext.DisconnectCommand, Source={x:Reference perphPage}}"
-            CommandParameter="{Binding BleService.ConnectedPeripheral}" />
+    <Grid RowDefinitions="Auto, *">
+        <VerticalStackLayout Grid.Row="0" Padding="20" Spacing="5"
+                             BackgroundColor="{AppThemeBinding Light=#F8F8F8, Dark=#121212}">
+            <Label Text="MotionLink Connect" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
+            <Label Text="Ensure your Device is powered on" FontSize="14" TextColor="Gray"
+                   HorizontalOptions="Center" />
         </VerticalStackLayout>
 
+        <ScrollView Grid.Row="1" Padding="15">
+            <VerticalStackLayout Spacing="15">
 
-        <VerticalStackLayout IsVisible="{Binding BleService.IsConnected, Converter={StaticResource InvertedBoolConverter}}">
-            <Button Text="Start Scan"
-                    Command="{Binding StartScanCommand}"
-                    IsVisible="{Binding IsScanning,Converter={StaticResource InvertedBoolConverter}}" />
-            <Button Text="Stop Scan"
-                    Command="{Binding StopScanCommand}"
-                    IsVisible="{Binding IsScanning}" />
+        <Frame IsVisible="{Binding BleService.IsConnected}"
+            BackgroundColor="#E8F5E9"
+            BorderColor="#4CAF50"
+            HasShadow="True"
+            Padding="10">
+            <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="12">
 
-            <CollectionView ItemsSource="{Binding Devices}">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Border Padding="10" Margin="5">
-                            <Border.Stroke>Gray</Border.Stroke>
+                <Label Grid.Column="0"
+                    Text="✓"
+                    TextColor="#4CAF50"
+                    FontSize="24"
+                    VerticalOptions="Center" />
 
-                            <!-- <Border.Triggers>
-                                <DataTrigger TargetType="Border" 
-                                            Binding="{Binding IsDeviceConnected}" 
-                                            Value="True">
-                                    <Setter Property="BackgroundColor" Value="#2000FF00" />
-                                    <Setter Property="Stroke" Value="Green" />
-                                </DataTrigger>
-                                <DataTrigger TargetType="Border"
-                                    Binding="{Binding IsDeviceConnected}"
-                                            Value="True">
-                                    <Setter Property="BackgroundColor" Value="#2000FF00" />
-                                    <Setter Property="Stroke" Value="Green" />
-                                </DataTrigger>
+                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                    <Label Text="{Binding BleService.ConnectedPeripheral.Name, FallbackValue='Connected'}"
+                        FontAttributes="Bold"
+                        LineBreakMode="TailTruncation" />
+                    <Label Text="{Binding BleService.ConnectedPeripheral.Uuid}"
+                        FontSize="8"
+                        TextColor="Gray"
+                        LineBreakMode="CharacterWrap" />
+                </VerticalStackLayout>
 
-                            </Border.Triggers> -->
-                            <VerticalStackLayout Padding="5" Margin="10">
-                                <Label Text="{Binding Name}" />
-                                <Label Text="{Binding Uuid}" FontSize="10" />
-                                <!-- <Button Text="Connect"
-                                        Command="{Binding BindingContext.ConnectCommand, Source={x:Reference perphPage}}"
-                                        CommandParameter="{Binding .}" /> -->
-                            <Button Text="Connect"
-                                Command="{Binding BindingContext.ConnectCommand, Source={x:Reference perphPage}}"
-                                CommandParameter="{Binding .}" />
+                <Button Grid.Column="2"
+                        Text="Disconnect"
+                        Command="{Binding DisconnectCommand}"
+                        BackgroundColor="#D32F2F"
+                        TextColor="White"
+                        FontSize="12"
+                        HeightRequest="35"
+                        Padding="10,0"
+                        VerticalOptions="Center"
+                        HorizontalOptions="End" />
+            </Grid>
+        </Frame>
 
-                        <!-- <Button Text="Disconnect"
-                                IsVisible="{Binding IsDeviceConnected}"
-                                Command="{Binding BindingContext.DisconnectCommand, Source={x:Reference perphPage}}"
-                                CommandParameter="{Binding .}" /> -->
+                <VerticalStackLayout
+                    IsVisible="{Binding BleService.IsConnected, Converter={StaticResource InvertedBoolConverter}}"
+                    Spacing="10">
+                    <Button Text="Start Scanning"
+                            Command="{Binding StartScanCommand}"
+                            IsVisible="{Binding IsScanning, Converter={StaticResource InvertedBoolConverter}}"
+                            BackgroundColor="#2196F3" CornerRadius="25" />
 
+                    <Button Text="Stop Scanning"
+                            Command="{Binding StopScanCommand}"
+                            IsVisible="{Binding IsScanning}"
+                            BackgroundColor="#607D8B" CornerRadius="25" />
+
+                    <CollectionView ItemsSource="{Binding Devices}" Margin="0,10">
+                        <CollectionView.EmptyView>
+                            <VerticalStackLayout HorizontalOptions="Center" Padding="40">
+                                <Label Text="No devices found yet..." HorizontalOptions="Center" TextColor="Gray" />
                             </VerticalStackLayout>
-                        </Border>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Frame Margin="0,5" Padding="10" HasShadow="False" BorderColor="#DDDDDD">
+                                    <Grid ColumnDefinitions="*, Auto">
+                                        <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
+                                            <Label Text="{Binding Name, FallbackValue='Unknown Device'}"
+                                                   FontAttributes="Bold" />
+                                            <Label Text="{Binding Uuid}" FontSize="10" TextColor="Gray" />
+                                        </VerticalStackLayout>
+                                        <Button Grid.Column="1" Text="Connect"
+                                                Command="{Binding BindingContext.ConnectCommand, Source={x:Reference perphPage}}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="#2196F3" HeightRequest="40" CornerRadius="20" />
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
 
-        </VerticalStackLayout>
+                <Button Text="Open Dashboard"
+                        Command="{Binding NavigateToDashboardCommand}"
+                        IsVisible="{Binding BleService.IsConnected}"
+                        Margin="0,20" BackgroundColor="#4CAF50" HeightRequest="60" CornerRadius="30" />
 
-
-    </VerticalStackLayout>
-
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
 </views:BaseContentPage>

@@ -112,10 +112,23 @@ public partial class BleService : ObservableObject, IBleService
             double currentG = Math.Sqrt(cleanAx * cleanAx + cleanAy * cleanAy + cleanAz * cleanAz);
             double currentRot = Math.Sqrt(rawGx * rawGx + rawGy * rawGy + rawGz * rawGz);
 
+            // // Convert Degrees/Second to Radians/Second
+            // double radiansPerSecond = currentRot * (Math.PI / 180);
+
+            // // Calculate Linear Speed (Meters per Second)
+            // double metersPerSecond = radiansPerSecond * 1.14;
+
+            // // Convert to MPH
+            // double mph = metersPerSecond * 2.237;
+
+            // // Update a new property
+            // PeakMph = mph;
+
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 if (currentG > PeakGForce) PeakGForce = currentG;
                 if (currentRot > PeakRotation) PeakRotation = currentRot;
+                // if (currentRot > PeakRotation) PeakRotation = currentRot;
 
                 LastValue = new ROMPacket { TimeStamp = DateTimeOffset.Now, Ax = cleanAx, Ay = cleanAy, Az = cleanAz, Gx = rawGx, Gy = rawGy, Gz = rawGz };
 
