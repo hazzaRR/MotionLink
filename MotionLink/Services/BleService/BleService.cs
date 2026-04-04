@@ -17,7 +17,14 @@ public partial class BleService : ObservableObject, IBleService
 {
     private readonly ILogger<BleService> _logger;
     private readonly IBleManager _bleManager;
+    private readonly SimpleMovingAverage _filterAx = new(5);
+    private readonly SimpleMovingAverage _filterAy = new(5);
+    private readonly SimpleMovingAverage _filterAz = new(5);
 
+    [ObservableProperty] 
+    private double _peakRotation; // Proxy for swing speed
+    [ObservableProperty]
+    private double _peakGForce;
 
     [ObservableProperty]
     private IPeripheral? _connectedPeripheral;
@@ -40,21 +47,21 @@ public partial class BleService : ObservableObject, IBleService
         _logger = logger;
         _bleManager = bleManager;
         
-        AccelSeries = new ISeries[]
-        {
+        AccelSeries =
+        [
 
-            new LineSeries<double> { Values = AccX, Name = "Acc X", Stroke = new SolidColorPaint(SKColors.Blue) { StrokeThickness = 4 }},
-            new LineSeries<double> { Values = AccY, Name = "Acc Y", Stroke = new SolidColorPaint(SKColors.Red) { StrokeThickness = 4 }},
-            new LineSeries<double> { Values = AccZ, Name = "Acc Z", Stroke = new SolidColorPaint(SKColors.Green) { StrokeThickness = 4 }},
+            new LineSeries<double> { Values = AccX, Name = "Acc X", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Blue) { StrokeThickness = 4 }},
+            new LineSeries<double> { Values = AccY, Name = "Acc Y", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Red) { StrokeThickness = 4 }},
+            new LineSeries<double> { Values = AccZ, Name = "Acc Z", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Green) { StrokeThickness = 4 }},
 
-        };
+        ];
 
-        GyroSeries = new ISeries[]
-        {
-            new LineSeries<double> { Values = GyroX, Name = "Gyro X", Stroke = new SolidColorPaint(SKColors.Blue) { StrokeThickness = 4 }},
-            new LineSeries<double> { Values = GyroY, Name = "Gyro Y", Stroke = new SolidColorPaint(SKColors.Red) { StrokeThickness = 4 }},
-            new LineSeries<double> { Values = GyroZ, Name = "Gyro Z", Stroke = new SolidColorPaint(SKColors.Green) { StrokeThickness = 4 }}
-        };
+        GyroSeries =
+        [
+            new LineSeries<double> { Values = GyroX, Name = "Gyro X", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Blue) { StrokeThickness = 4 }},
+            new LineSeries<double> { Values = GyroY, Name = "Gyro Y", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Red) { StrokeThickness = 4 }},
+            new LineSeries<double> { Values = GyroZ, Name = "Gyro Z", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Green) { StrokeThickness = 4 }}
+        ];
 
     }
 
@@ -90,33 +97,38 @@ public partial class BleService : ObservableObject, IBleService
         {
             _logger.LogInformation($"{data.Data.Length}");
             _logger.LogInformation(BitConverter.ToString(data.Data));
-            
-           ROMPacket packet = new ROMPacket
-            {
-                TimeStamp = DateTimeOffset.Now,
-                Ax = BitConverter.ToSingle(data.Data, 0),
-                Ay = BitConverter.ToSingle(data.Data, 4),
-                Az = BitConverter.ToSingle(data.Data, 8),
-                Gx = BitConverter.ToSingle(data.Data, 12),
-                Gy = BitConverter.ToSingle(data.Data, 16),
-                Gz = BitConverter.ToSingle(data.Data, 20)
-            };
 
-                MainThread.BeginInvokeOnMainThread(() =>
+            double rawAx = BitConverter.ToSingle(data.Data, 0);
+            double rawAy = BitConverter.ToSingle(data.Data, 4);
+            double rawAz = BitConverter.ToSingle(data.Data, 8);
+            double rawGx = BitConverter.ToSingle(data.Data, 12);
+            double rawGy = BitConverter.ToSingle(data.Data, 16);
+            double rawGz = BitConverter.ToSingle(data.Data, 20);
+                    
+            double cleanAx = _filterAx.Compute(rawAx);
+            double cleanAy = _filterAy.Compute(rawAy);
+            double cleanAz = _filterAz.Compute(rawAz);
+
+            double currentG = Math.Sqrt(cleanAx * cleanAx + cleanAy * cleanAy + cleanAz * cleanAz);
+            double currentRot = Math.Sqrt(rawGx * rawGx + rawGy * rawGy + rawGz * rawGz);
+
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                if (currentG > PeakGForce) PeakGForce = currentG;
+                if (currentRot > PeakRotation) PeakRotation = currentRot;
+
+                LastValue = new ROMPacket { TimeStamp = DateTimeOffset.Now, Ax = cleanAx, Ay = cleanAy, Az = cleanAz, Gx = rawGx, Gy = rawGy, Gz = rawGz };
+
+                lock (Sync)
                 {
-                    LastValue = packet;
-                });
-
-            lock (Sync)
-            {
-                AddPoint(AccX, packet.Ax);
-                AddPoint(AccY, packet.Ay);
-                AddPoint(AccZ, packet.Az);
-
-                AddPoint(GyroX, packet.Gx);
-                AddPoint(GyroY, packet.Gy);
-                AddPoint(GyroZ, packet.Gz);
-            }
+                    AddPoint(AccX, cleanAx);
+                    AddPoint(AccY, cleanAy);
+                    AddPoint(AccZ, cleanAz);
+                    AddPoint(GyroX, rawGx);
+                    AddPoint(GyroY, rawGy);
+                    AddPoint(GyroZ, rawGz);
+                }
+            });
 
         });
         
@@ -126,7 +138,7 @@ public partial class BleService : ObservableObject, IBleService
     {
         list.Add(value);
 
-        if (list.Count > 200)
+        if (list.Count > 100)
             list.RemoveAt(0);
     }
 

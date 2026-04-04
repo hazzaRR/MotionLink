@@ -27,17 +27,17 @@ public partial class TelemetryEndpointViewModel : BaseViewModel
         _client = client;
     }
 
-    [RelayCommand]
-    async Task SendData()
-    {
-        try
-        {
-            await _client.PostAsJsonAsync(_url, "test data");
-        }
-        catch (Exception ex)
-        {
-        }
-    }
+    // [RelayCommand]
+    // public async Task SendData()
+    // {
+    //     try
+    //     {
+    //         await _client.PostAsJsonAsync(Url, "test data");
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //     }
+    // }
 
     
 }
