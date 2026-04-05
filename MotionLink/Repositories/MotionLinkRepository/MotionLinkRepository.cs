@@ -52,7 +52,7 @@ public class MotionLinkRepository : IMotionLinkRepository
     {
         await InitialiseAsync(stoppingToken);
         var sql = @"
-            SELECT s.Id, s.Name, s.DateStart, COUNT(sw.Id) as SwingCount 
+            SELECT s.Id, s.Name, s.DateStart, s.DateEnd, COUNT(sw.Id) as SwingCount 
             FROM Sessions s 
             LEFT JOIN Swing sw ON sw.SessionId = s.Id 
             GROUP BY s.Id";
