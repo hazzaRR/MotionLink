@@ -6,7 +6,6 @@ using Shiny.BluetoothLE;
 using System.Reactive.Linq;
 using MotionLink.Views;
 using Microsoft.Extensions.Logging;
-using Android.Util;
 
 namespace MotionLink.ViewModels;
 

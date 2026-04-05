@@ -6,6 +6,7 @@ using MotionLink.Views;
 using Shiny;
 // using Syncfusion.Maui.Toolkit.Hosting;
 using LiveChartsCore.SkiaSharpView.Maui;
+using MotionLink.Repositories;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 
 namespace MotionLink
@@ -29,6 +30,7 @@ namespace MotionLink
                 })
             // .RegisterRepositories()
             .RegisterServices()
+            .RegisterRepositories()
             .RegisterViewModels()
             .RegisterViews();
 
@@ -67,6 +69,12 @@ namespace MotionLink
             //     client.DefaultRequestHeaders.Add("Accept", "application/json");
             //     client.DefaultRequestHeaders.Add("User-Agent", "MotionlinkDevice");
             // });
+
+            return builder;
+        }
+        private static MauiAppBuilder RegisterRepositories(this MauiAppBuilder builder)
+        {
+            builder.Services.AddSingleton<IMotionLinkRepository, MotionLinkRepository>();
 
             return builder;
         }

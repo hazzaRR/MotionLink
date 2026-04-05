@@ -31,7 +31,7 @@ public partial class BleService : ObservableObject, IBleService
     public bool IsConnected => ConnectedPeripheral != null;
 
     [ObservableProperty]
-    private ROMPacket _lastValue;
+    private ImuPacket _lastValue;
 
     private ObservableCollection<double> AccX { get; } = new();
     private ObservableCollection<double> AccY { get; } = new();
@@ -130,7 +130,7 @@ public partial class BleService : ObservableObject, IBleService
                 if (currentRot > PeakRotation) PeakRotation = currentRot;
                 // if (currentRot > PeakRotation) PeakRotation = currentRot;
 
-                LastValue = new ROMPacket { TimeStamp = DateTimeOffset.Now, Ax = cleanAx, Ay = cleanAy, Az = cleanAz, Gx = rawGx, Gy = rawGy, Gz = rawGz };
+                LastValue = new ImuPacket { TimeStamp = DateTime.Now, Ax = cleanAx, Ay = cleanAy, Az = cleanAz, Gx = rawGx, Gy = rawGy, Gz = rawGz };
 
                 lock (Sync)
                 {

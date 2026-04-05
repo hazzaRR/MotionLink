@@ -7,7 +7,7 @@ namespace MotionLink.Services;
 
 public interface IBleService
 {
-    ROMPacket LastValue {get;}
+    ImuPacket LastValue {get;}
     ISeries[] AccelSeries { get; }
     ISeries[] GyroSeries { get; }
     object Sync { get; }

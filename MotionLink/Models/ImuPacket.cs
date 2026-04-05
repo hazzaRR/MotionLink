@@ -1,6 +1,15 @@
+using SQLite;
+
 namespace MotionLink.Models;
-public class ROMPacket
-{    public DateTimeOffset TimeStamp {get; set; }
+
+[Table("ImuPackets")]
+public class ImuPacket
+{
+    [PrimaryKey, AutoIncrement]
+    public int Id { get; set; }
+    [Indexed]
+    public int SwingId {get; set; }
+    public DateTime TimeStamp {get; set; }
     public double Ax {get; set; }
     public double Ay {get; set; }
     public double Az {get; set; }
