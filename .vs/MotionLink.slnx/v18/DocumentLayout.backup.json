@@ -1,0 +1,87 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\redma\\Documents\\Coding Projects\\C#\\MotionLink\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{4A2C1FB6-16E7-F7A0-996D-263B70431BDC}|MotionLink\\MotionLink.csproj|c:\\users\\redma\\documents\\coding projects\\c#\\motionlink\\motionlink\\viewmodels\\historyviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4A2C1FB6-16E7-F7A0-996D-263B70431BDC}|MotionLink\\MotionLink.csproj|solutionrelative:motionlink\\viewmodels\\historyviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4A2C1FB6-16E7-F7A0-996D-263B70431BDC}|MotionLink\\MotionLink.csproj|c:\\users\\redma\\documents\\coding projects\\c#\\motionlink\\motionlink\\views\\historyview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{4A2C1FB6-16E7-F7A0-996D-263B70431BDC}|MotionLink\\MotionLink.csproj|solutionrelative:motionlink\\views\\historyview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4A2C1FB6-16E7-F7A0-996D-263B70431BDC}|MotionLink\\MotionLink.csproj|c:\\users\\redma\\documents\\coding projects\\c#\\motionlink\\motionlink\\repositories\\motionlinkrepository\\motionlinkrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4A2C1FB6-16E7-F7A0-996D-263B70431BDC}|MotionLink\\MotionLink.csproj|solutionrelative:motionlink\\repositories\\motionlinkrepository\\motionlinkrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4A2C1FB6-16E7-F7A0-996D-263B70431BDC}|MotionLink\\MotionLink.csproj|c:\\users\\redma\\documents\\coding projects\\c#\\motionlink\\motionlink\\views\\historyview.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4A2C1FB6-16E7-F7A0-996D-263B70431BDC}|MotionLink\\MotionLink.csproj|solutionrelative:motionlink\\views\\historyview.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "HistoryViewModel.cs",
+              "DocumentMoniker": "C:\\Users\\redma\\Documents\\Coding Projects\\C#\\MotionLink\\MotionLink\\ViewModels\\HistoryViewModel.cs",
+              "RelativeDocumentMoniker": "MotionLink\\ViewModels\\HistoryViewModel.cs",
+              "ToolTip": "C:\\Users\\redma\\Documents\\Coding Projects\\C#\\MotionLink\\MotionLink\\ViewModels\\HistoryViewModel.cs",
+              "RelativeToolTip": "MotionLink\\ViewModels\\HistoryViewModel.cs",
+              "ViewState": "AgIAAB4AAAAAAAAAAADwvzQAAAAIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-05T18:09:24.194Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "HistoryView.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\redma\\Documents\\Coding Projects\\C#\\MotionLink\\MotionLink\\Views\\HistoryView.xaml.cs",
+              "RelativeDocumentMoniker": "MotionLink\\Views\\HistoryView.xaml.cs",
+              "ToolTip": "C:\\Users\\redma\\Documents\\Coding Projects\\C#\\MotionLink\\MotionLink\\Views\\HistoryView.xaml.cs",
+              "RelativeToolTip": "MotionLink\\Views\\HistoryView.xaml.cs",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAAwA4AAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-05T15:58:33.466Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "HistoryView.xaml",
+              "DocumentMoniker": "C:\\Users\\redma\\Documents\\Coding Projects\\C#\\MotionLink\\MotionLink\\Views\\HistoryView.xaml",
+              "RelativeDocumentMoniker": "MotionLink\\Views\\HistoryView.xaml",
+              "ToolTip": "C:\\Users\\redma\\Documents\\Coding Projects\\C#\\MotionLink\\MotionLink\\Views\\HistoryView.xaml",
+              "RelativeToolTip": "MotionLink\\Views\\HistoryView.xaml",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAABYAAAA1AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-04-05T15:58:28.753Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "MotionLinkRepository.cs",
+              "DocumentMoniker": "C:\\Users\\redma\\Documents\\Coding Projects\\C#\\MotionLink\\MotionLink\\Repositories\\MotionLinkRepository\\MotionLinkRepository.cs",
+              "RelativeDocumentMoniker": "MotionLink\\Repositories\\MotionLinkRepository\\MotionLinkRepository.cs",
+              "ToolTip": "C:\\Users\\redma\\Documents\\Coding Projects\\C#\\MotionLink\\MotionLink\\Repositories\\MotionLinkRepository\\MotionLinkRepository.cs",
+              "RelativeToolTip": "MotionLink\\Repositories\\MotionLinkRepository\\MotionLinkRepository.cs",
+              "ViewState": "AgIAAGEAAAAAAAAAAAAswHQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-05T15:51:22.1Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

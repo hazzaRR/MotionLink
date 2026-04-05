@@ -1,10 +1,12 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
+
 <views:BaseContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:views="clr-namespace:MotionLink.Views"
-             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             x:Class="MotionLink.Views.HistoryView"
-             Title="Session History">
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:MotionLink.Views"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    x:Class="MotionLink.Views.HistoryView"
+    x:Name="historyPage"
+    Title="Session History">
     <Grid RowDefinitions="Auto, *">
         <ScrollView Grid.Row="1" Padding="15">
             <VerticalStackLayout Spacing="15">
@@ -20,21 +22,82 @@
                         </CollectionView.EmptyView>
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
-                                <Border Margin="0,5" Padding="10" Stroke="#DDDDDD">
-                                    <Grid ColumnDefinitions="*, Auto">
-                                        <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
-                                            <Label Text="{Binding Name, FallbackValue='Unnamed Session'}"
-                                                   FontAttributes="Bold" />
-                                            <Label Text="{Binding DateStart}" FontSize="10" TextColor="Gray" />
-                                            <Label Text="{Binding DateEnd}" FontSize="10" TextColor="Gray" />
-                                        </VerticalStackLayout>
-                                        <!-- <Button Grid.Column="1" Text="Connect"
-                                                Command="{Binding BindingContext.ConnectCommand, Source={x:Reference perphPage}}"
-                                                CommandParameter="{Binding .}"
-                                                BackgroundColor="#2196F3" HeightRequest="40" CornerRadius="20" /> -->
-                                    </Grid>
+                                <SwipeView>
+                                    <SwipeView.LeftItems>
+                                            <SwipeItems>
+                                            <SwipeItemView
+                                                Command="{Binding BindingContext.DeleteSessionCommand, Source={x:Reference historyPage}}"
+                                                CommandParameter="{Binding .}">
+                                                <Border
+                                                    BackgroundColor="Red"
+                                                    Padding="14"
+                                                    StrokeShape="RoundRectangle 12">
+                                                <Label Text="Delete"
+                                                    TextColor="White"
+                                                    VerticalOptions="Center"
+                                                    HorizontalOptions="Start" />
+                                                </Border>
+                                            </SwipeItemView>
+
+                                        </SwipeItems>
+                                     </SwipeView.LeftItems>
+                                    <Border Margin="0,8"
+                                        Padding="14"
+                                        Stroke="#CCCCCC"
+                                        StrokeThickness="1.5"
+                                        BackgroundColor="#FFFFFF"
+                                        Shadow="Medium"
+                                        StrokeShape="RoundRectangle 12">
+                                        <Grid ColumnDefinitions="Auto, *" ColumnSpacing="15">
+                                            <BoxView WidthRequest="6"
+                                                 BackgroundColor="#1E88E5"
+                                                 CornerRadius="3"
+                                                 VerticalOptions="Fill" />
+
+                                            <VerticalStackLayout Grid.Column="1" Spacing="4">
+
+                                                <Label Text="{Binding Name, FallbackValue='Unnamed Session'}"
+                                                   FontAttributes="Bold"
+                                                   FontSize="16"
+                                                   TextColor="#1E1E1E" />
+
+                                                <HorizontalStackLayout Spacing="10">
+                                                    <Label Text="Start:"
+                                                       FontSize="11"
+                                                       TextColor="#777" />
+                                                    <Label Text="{Binding DateStart}"
+                                                       FontSize="11"
+                                                       TextColor="#444" />
+                                                </HorizontalStackLayout>
+
+                                                <HorizontalStackLayout Spacing="10">
+                                                    <Label Text="End:"
+                                                       FontSize="11"
+                                                       TextColor="#777" />
+                                                    <Label Text="{Binding DateEnd}"
+                                                       FontSize="11"
+                                                       TextColor="#444" />
+                                                </HorizontalStackLayout>
+
+                                                <Border Padding="6"
+                                                   BackgroundColor="#E3F2FD"
+                                                   Shadow="None"
+                                                    StrokeThickness="0"
+                                                   Margin="0,6,0,0"
+                                                   StrokeShape="RoundRectangle 6">
+                                                    <Label Text="{Binding SwingCount, StringFormat='Swings: {0}'}"
+                                                       FontAttributes="Bold"
+                                                       FontSize="12"
+                                                       TextColor="#1565C0" />
+                                                </Border>
+
+                                            </VerticalStackLayout>
+
+                                        </Grid>
                                 </Border>
+                                </SwipeView>
                             </DataTemplate>
+
                         </CollectionView.ItemTemplate>
                     </CollectionView>
                 </VerticalStackLayout>

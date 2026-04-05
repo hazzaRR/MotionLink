@@ -75,7 +75,6 @@ namespace MotionLink
         private static MauiAppBuilder RegisterRepositories(this MauiAppBuilder builder)
         {
             builder.Services.AddSingleton<IMotionLinkRepository, MotionLinkRepository>();
-
             return builder;
         }
 

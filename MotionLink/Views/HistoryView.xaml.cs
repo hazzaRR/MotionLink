@@ -9,4 +9,14 @@ public partial class HistoryView : BaseContentPage
 		InitializeComponent();
 		BindingContext = historyViewModel;
 	}
+
+	protected override async void OnAppearing()
+	{
+		base.OnAppearing();
+
+		if (BindingContext is HistoryViewModel vm)
+		{
+			await vm.InitializeAsync();
+		}
+	}
 }
