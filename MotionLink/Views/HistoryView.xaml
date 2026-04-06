@@ -10,6 +10,16 @@
     <Grid RowDefinitions="Auto, *">
         <ScrollView Grid.Row="1" Padding="15">
             <VerticalStackLayout Spacing="15">
+                <Border Padding="6"
+                BackgroundColor="#E3F2FD"
+                StrokeThickness="0"
+                Margin="0,6,0,0"
+                StrokeShape="RoundRectangle 6">
+                    <Label Text="{Binding Histories.Count, StringFormat='Sessions: {0}'}"
+                    FontAttributes="Bold"
+                    FontSize="12"
+                    TextColor="#1565C0" />
+                </Border>
                 <VerticalStackLayout Spacing="10">
                     <CollectionView ItemsSource="{Binding Histories}" Margin="0,10">
                         <CollectionView.EmptyView>
@@ -26,7 +36,7 @@
                                     <SwipeView.LeftItems>
                                             <SwipeItems>
                                             <SwipeItemView
-                                                Command="{Binding BindingContext.DeleteSessionCommand, Source={x:Reference historyPage}}"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type views:HistoryView}}, Path=BindingContext.DeleteSessionCommand}"
                                                 CommandParameter="{Binding .}">
                                                 <Border
                                                     BackgroundColor="Red"
@@ -46,7 +56,6 @@
                                         Stroke="#CCCCCC"
                                         StrokeThickness="1.5"
                                         BackgroundColor="#FFFFFF"
-                                        Shadow="Medium"
                                         StrokeShape="RoundRectangle 12">
                                         <Grid ColumnDefinitions="Auto, *" ColumnSpacing="15">
                                             <BoxView WidthRequest="6"
@@ -65,7 +74,7 @@
                                                     <Label Text="Start:"
                                                        FontSize="11"
                                                        TextColor="#777" />
-                                                    <Label Text="{Binding DateStart}"
+                                                    <Label Text="{Binding DateStart, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}"
                                                        FontSize="11"
                                                        TextColor="#444" />
                                                 </HorizontalStackLayout>
@@ -74,15 +83,14 @@
                                                     <Label Text="End:"
                                                        FontSize="11"
                                                        TextColor="#777" />
-                                                    <Label Text="{Binding DateEnd}"
+                                                    <Label Text="{Binding DateEnd, TargetNullValue='--', StringFormat='{}{0:yyyy-MM-dd HH:mm}'}"
                                                        FontSize="11"
                                                        TextColor="#444" />
                                                 </HorizontalStackLayout>
 
                                                 <Border Padding="6"
                                                    BackgroundColor="#E3F2FD"
-                                                   Shadow="None"
-                                                    StrokeThickness="0"
+                                                   StrokeThickness="0"
                                                    Margin="0,6,0,0"
                                                    StrokeShape="RoundRectangle 6">
                                                     <Label Text="{Binding SwingCount, StringFormat='Swings: {0}'}"
@@ -94,7 +102,7 @@
                                             </VerticalStackLayout>
 
                                         </Grid>
-                                </Border>
+                                    </Border>
                                 </SwipeView>
                             </DataTemplate>
 

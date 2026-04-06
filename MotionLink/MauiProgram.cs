@@ -82,7 +82,7 @@ namespace MotionLink
         {
             builder.Services.AddSingleton<PeripheralConnectViewModel>();
             builder.Services.AddScoped<SensorDisplayViewModel>();
-            builder.Services.AddScoped<HistoryViewModel>();
+            builder.Services.AddTransient<HistoryViewModel>();
             builder.Services.AddScoped<TelemetryEndpointViewModel>();
             return builder;
         }
@@ -91,7 +91,7 @@ namespace MotionLink
         {
             builder.Services.AddScoped<PeripheralConnectView>();
             builder.Services.AddScoped<SensorDisplayView>();
-            builder.Services.AddScoped<HistoryView>();
+            builder.Services.AddTransient<HistoryView>();
             builder.Services.AddScoped<TelemetryEndpointView>();
             
             return builder;

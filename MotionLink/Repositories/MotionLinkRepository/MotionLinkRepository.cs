@@ -50,14 +50,24 @@ public class MotionLinkRepository : IMotionLinkRepository
 
     public async Task<List<SessionOverview>> GetSessionsAsync(CancellationToken stoppingToken = default)
     {
-        await InitialiseAsync(stoppingToken);
-        var sql = @"
-            SELECT s.Id, s.Name, s.DateStart, s.DateEnd, COUNT(sw.Id) as SwingCount 
-            FROM Sessions s 
-            LEFT JOIN Swing sw ON sw.SessionId = s.Id 
-            GROUP BY s.Id";
+        try
+        {
+            await InitialiseAsync(stoppingToken);
+            var sql = @"
+                SELECT s.Id, s.Name, s.DateStart, s.DateEnd, COUNT(sw.Id) as SwingCount 
+                FROM Sessions s 
+                LEFT JOIN Swings sw ON sw.SessionId = s.Id 
+                GROUP BY s.Id";
 
-        return await _database!.QueryAsync<SessionOverview>(sql);
+            return await _database!.QueryAsync<SessionOverview>(sql);
+
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("SQLITE ERROR: " + ex);
+            throw;
+        }
+
     }
 
     public async Task<Swing?> GetSwingByIdAsync(int id, CancellationToken stoppingToken = default)
@@ -84,22 +94,22 @@ public class MotionLinkRepository : IMotionLinkRepository
         await _database.CreateTableAsync<Session>();
 
         await _database.ExecuteAsync(@"
-            CREATE TABLE IF NOT EXISTS Swing (
+            CREATE TABLE IF NOT EXISTS Swings (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 SessionId INTEGER,
                 PeakGForce REAL,
                 PeakRotation REAL,
-                FOREIGN KEY(SessionId) REFERENCES Session(Id) ON DELETE CASCADE
+                FOREIGN KEY(SessionId) REFERENCES Sessions(Id) ON DELETE CASCADE
             );");
 
         await _database.ExecuteAsync(@"
-            CREATE TABLE IF NOT EXISTS ImuPacket (
+            CREATE TABLE IF NOT EXISTS ImuPackets (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 SwingId INTEGER,
                 Ax REAL, Ay REAL, Az REAL,
                 Gx REAL, Gy REAL, Gz REAL,
                 Timestamp DATETIME,
-                FOREIGN KEY(SwingId) REFERENCES Swing(Id) ON DELETE CASCADE
+                FOREIGN KEY(SwingId) REFERENCES Swings(Id) ON DELETE CASCADE
             );");
     }
 
