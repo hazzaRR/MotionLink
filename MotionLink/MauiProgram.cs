@@ -62,6 +62,7 @@ namespace MotionLink
         private static MauiAppBuilder RegisterServices(this MauiAppBuilder builder)
         {
             builder.Services.AddSingleton<IBleService, BleService>();
+            builder.Services.AddScoped<INavigationService, NavigationService>();
             builder.Services.AddBluetoothLE();
 
             // builder.Services.AddHttpClient<IGatewayClient, GatewayClient>(client =>
@@ -83,6 +84,7 @@ namespace MotionLink
             builder.Services.AddSingleton<PeripheralConnectViewModel>();
             builder.Services.AddScoped<SensorDisplayViewModel>();
             builder.Services.AddTransient<HistoryViewModel>();
+            builder.Services.AddTransient<SessionDetailViewModel>();
             builder.Services.AddScoped<TelemetryEndpointViewModel>();
             return builder;
         }
@@ -92,6 +94,7 @@ namespace MotionLink
             builder.Services.AddScoped<PeripheralConnectView>();
             builder.Services.AddScoped<SensorDisplayView>();
             builder.Services.AddTransient<HistoryView>();
+            builder.Services.AddTransient<SessionDetailPage>();
             builder.Services.AddScoped<TelemetryEndpointView>();
             
             return builder;

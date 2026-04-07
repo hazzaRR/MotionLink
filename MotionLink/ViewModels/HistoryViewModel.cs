@@ -7,8 +7,8 @@ using MotionLink.Repositories;
 using Microsoft.Extensions.Logging;
 using MotionLink.Models;
 using CommunityToolkit.Maui.Core.Extensions;
-using System.Diagnostics;
 using Microsoft.Maui.Controls.Internals;
+using MotionLink.Services;
 
 namespace MotionLink.ViewModels;
 
@@ -21,11 +21,16 @@ public partial class HistoryViewModel : BaseViewModel
     [ObservableProperty]
     private ObservableCollection<SessionOverview> _histories = [];
 
+    [ObservableProperty] 
+    private SessionOverview? _selectedSession;
+
     private readonly IMotionLinkRepository _repo;
-    public HistoryViewModel(ILogger<HistoryViewModel> logger, IMotionLinkRepository repo)
+    private readonly INavigationService _navigationService;
+    public HistoryViewModel(ILogger<HistoryViewModel> logger, IMotionLinkRepository repo, INavigationService navigationService)
     {
         _logger = logger;
         _repo = repo;
+        _navigationService = navigationService;
     }
     public bool HasHistories => Histories.Count > 0;
 
@@ -39,7 +44,6 @@ public partial class HistoryViewModel : BaseViewModel
         catch (Exception ex)
         {
             _logger.LogError($"fetching histories failed: {ex.Message}");
-            Debug.WriteLine("CRASH IN COLLECTION BINDING: " + ex);
             throw;
         }
     }
@@ -47,7 +51,7 @@ public partial class HistoryViewModel : BaseViewModel
     [RelayCommand]
     async Task NavigateToDashboard()
     {
-        await Shell.Current.GoToAsync($"///{nameof(SensorDisplayView)}");
+        await _navigationService.NavigateToDashboard();
     }
 
     [RelayCommand]
@@ -55,6 +59,16 @@ public partial class HistoryViewModel : BaseViewModel
     {
         await _repo.DeleteSessionAsync(session.Id, default);
         Histories.Remove(session);
+    }
+
+    [RelayCommand]
+    private async Task NavigateToSelectedDetail()
+    {
+        if (SelectedSession is not null)
+        {
+            await _navigationService.GoToSessionDetail(SelectedSession.Id);
+            SelectedSession = null;
+        }
     }
 
 

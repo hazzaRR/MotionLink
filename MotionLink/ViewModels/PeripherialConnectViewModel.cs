@@ -21,11 +21,14 @@ public partial class PeripheralConnectViewModel : BaseViewModel
     [ObservableProperty]
     private bool _isScanning;
 
+    private readonly INavigationService _navigationService;
+
     private string TargetServiceUuid { get; } = "19B10000-E8F2-537E-4F6C-D104768A1214";
 
-    public PeripheralConnectViewModel(IBleService bleService)
+    public PeripheralConnectViewModel(IBleService bleService, INavigationService navigationService)
     {
         _bleService = bleService;
+        _navigationService = navigationService;
     }
 
     
@@ -84,7 +87,7 @@ public partial class PeripheralConnectViewModel : BaseViewModel
     [RelayCommand]
     async Task NavigateToDashboard()
     {
-        await Shell.Current.GoToAsync($"///{nameof(SensorDisplayView)}");
+        await _navigationService.NavigateToDashboard();
     }
 
 

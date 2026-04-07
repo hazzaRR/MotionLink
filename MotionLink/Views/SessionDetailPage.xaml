@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:BaseContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:MotionLink.Views"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    x:Class="MotionLink.Views.SessionDetailPage"
+    Title="Session">
+    
+    <views:BaseContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+
+            <Style x:Key="StatCard" TargetType="Frame">
+                <!-- <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#F0F0F0, Dark=#2C2C2C}" /> -->
+                <Setter Property="CornerRadius" Value="12" />
+                <Setter Property="HasShadow" Value="True" />
+                <Setter Property="Padding" Value="15" />
+                <Setter Property="BorderColor" Value="Transparent" />
+            </Style>
+        </ResourceDictionary>
+    </views:BaseContentPage.Resources>
+    <Grid RowDefinitions="Auto, *">
+        <Label Text="{Binding SelectedSession.Name}"
+                FontSize="16"
+                TextColor="SteelBlue"
+               HorizontalOptions="Center"
+                FontAttributes="Bold" />
+        <ScrollView Grid.Row="1" Padding="15, 0">
+            <CollectionView ItemsSource="{Binding Swings}"
+                SelectedItem="{Binding SelectedSwing, Mode=TwoWay}"
+                SelectionMode="Single"
+                SelectionChangedCommand="{Binding NavigateToSelectedSwingCommand}"
+                Margin="0,10">
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <SwipeView>
+                            <SwipeView.LeftItems>
+                                <SwipeItems>
+                                    <SwipeItemView
+                            Command="{Binding Source={RelativeSource AncestorType={x:Type views:SessionDetailPage}}, Path=BindingContext.DeleteSwingCommand}"
+                            CommandParameter="{Binding .}">
+                                        <Grid BackgroundColor="#D32F2F" Padding="16">
+                                            <Label Text="Delete"
+                                       TextColor="White"
+                                       FontAttributes="Bold"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center" />
+                                        </Grid>
+                                    </SwipeItemView>
+                                </SwipeItems>
+                            </SwipeView.LeftItems>
+
+                            <Border Margin="0,10"
+                        Padding="18"
+                        Stroke="#1E88E5"
+                        StrokeThickness="2"
+                        BackgroundColor="#0D1B2A"
+                        StrokeShape="RoundRectangle 14">
+
+                                <Grid ColumnDefinitions="6, *" ColumnSpacing="18">
+
+                                    <BoxView WidthRequest="6"
+                                 BackgroundColor="#1E88E5"
+                                 CornerRadius="3"
+                                 VerticalOptions="Fill" />
+
+                                    <VerticalStackLayout Grid.Column="1" Spacing="10">
+
+                                        <Label Text="SWING PERFORMANCE"
+                                   FontSize="12"
+                                   TextColor="#90CAF9"
+                                   FontAttributes="Bold" />
+
+                                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+
+                                            <Border Grid.Column="0"
+                                                   StrokeThickness="0"
+                                                   StrokeShape="RoundRectangle 12"
+                                       Padding="12"
+                                       BackgroundColor="#102A43">
+                                                <VerticalStackLayout HorizontalOptions="Center">
+                                                    <Label Text="PEAK SPEED"
+                                               FontSize="11"
+                                               TextColor="#9FB3C8" />
+                                                    <Label Text="{Binding PeakRotation, StringFormat='{0:F1}°/s'}"
+                                               FontSize="26"
+                                               FontAttributes="Bold"
+                                               TextColor="#4DD0E1" />
+                                                </VerticalStackLayout>
+                                            </Border>
+
+                                            <Border Grid.Column="1"
+                                                   StrokeThickness="0"
+                                                   StrokeShape="RoundRectangle 12"
+                                       Padding="12"
+                                       BackgroundColor="#102A43"
+                                                   >
+                                                <VerticalStackLayout HorizontalOptions="Center">
+                                                    <Label Text="MAX FORCE"
+                                               FontSize="11"
+                                               TextColor="#9FB3C8" />
+                                                    <Label Text="{Binding PeakGForce, StringFormat='{0:F1} G'}"
+                                               FontSize="26"
+                                               FontAttributes="Bold"
+                                               TextColor="#FF7043" />
+                                                </VerticalStackLayout>
+                                            </Border>
+
+                                        </Grid>
+
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </SwipeView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </ScrollView>
+    </Grid>
+</views:BaseContentPage>

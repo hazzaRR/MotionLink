@@ -17,15 +17,17 @@ public partial class SensorDisplayViewModel : BaseViewModel
     [ObservableProperty]
     private IBleService _bleService;
     private IMotionLinkRepository _repo;
+    private readonly INavigationService _navigationService;
     private int? _currentSessionId;
 
     [ObservableProperty]
     private bool _isCapturing = false;
-    public SensorDisplayViewModel(ILogger<SensorDisplayViewModel> logger, IBleService bleService, IMotionLinkRepository repo)
+    public SensorDisplayViewModel(ILogger<SensorDisplayViewModel> logger, IBleService bleService, IMotionLinkRepository repo, INavigationService navigationService)
     {
         _logger = logger;
         _bleService = bleService;
         _repo = repo;
+        _navigationService = navigationService;
     }
 
     public async Task InitializeAsync()
@@ -51,7 +53,7 @@ public partial class SensorDisplayViewModel : BaseViewModel
     [RelayCommand]
     async Task NavigateToConnect()
     {
-        await Shell.Current.GoToAsync($"///{nameof(PeripheralConnectView)}");
+        await _navigationService.NavigateToConnect();
     }
 
 
