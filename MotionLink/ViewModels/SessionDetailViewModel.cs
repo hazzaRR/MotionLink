@@ -50,10 +50,6 @@ public partial class SessionDetailViewModel : BaseViewModel, IQueryAttributable
         if (Id != null)
         {
             SelectedSession = await _repo.GetSessionByIdAsync((int)Id);
-            SelectedSession?.Swings = [
-                new Swing() {  Id = 1, SessionId = SelectedSession.Id, PeakGForce = 6.22, PeakRotation = 12.11},
-                new Swing {  Id = 2, SessionId = SelectedSession.Id, PeakGForce = 3.45, PeakRotation = 11.89},
-                ];
 
             Swings = SelectedSession?.Swings?.ToObservableCollection();
         }
