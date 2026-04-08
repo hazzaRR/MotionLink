@@ -42,6 +42,7 @@ public partial class BleService : ObservableObject, IBleService
     public ISeries[] AccelSeries { get; }
     public ISeries[] GyroSeries { get; }
     public object Sync { get; } = new object();
+    public List<ImuPacket> SessionData { get; set; } = [];
     public BleService(ILogger<BleService> logger, IBleManager bleManager)
     {
         _logger = logger;
@@ -131,6 +132,8 @@ public partial class BleService : ObservableObject, IBleService
                 // if (currentRot > PeakRotation) PeakRotation = currentRot;
 
                 LastValue = new ImuPacket { TimeStamp = DateTime.Now, Ax = cleanAx, Ay = cleanAy, Az = cleanAz, Gx = rawGx, Gy = rawGy, Gz = rawGz };
+
+                SessionData.Add(LastValue);
 
                 lock (Sync)
                 {

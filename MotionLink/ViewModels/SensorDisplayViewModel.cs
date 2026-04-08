@@ -64,7 +64,7 @@ public partial class SensorDisplayViewModel : BaseViewModel
         {
             BleCharacteristicResult result = await BleService.ConnectedPeripheral.WriteCharacteristicAsync("19B10000-E8F2-537E-4F6C-D104768A1214", "FB7A8DB8-DE34-4C6F-9F98-D1612EE35441", [0x01]);
             IsCapturing = true;
-            _currentSessionId = await _repo.CreateSessionAsync(DateTime.Now,default);
+            _currentSessionId = await _repo.CreateSessionAsync(DateTime.Now, default);
         }
         catch (TimeoutException ex)
         {
@@ -83,6 +83,8 @@ public partial class SensorDisplayViewModel : BaseViewModel
             if (_currentSessionId != null)
             {
                 await _repo.UpdateSessionAsync((int) _currentSessionId, $"session-{DateTime.Now}", DateTime.Now, default);
+                await _repo.CreateSwingAsync((int)_currentSessionId, BleService.PeakGForce, BleService.PeakRotation, BleService.SessionData, default);
+                BleService.SessionData = [];
             }
 
             _currentSessionId = null;

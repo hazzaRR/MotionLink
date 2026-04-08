@@ -23,6 +23,21 @@ public class MotionLinkRepository : IMotionLinkRepository
         return session.Id;
     }
 
+    public async Task<int> CreateSwingAsync(int sessionId, double peakGForce, double PeakRotation, List<ImuPacket> data, CancellationToken stoppingToken = default)
+    {
+        await InitialiseAsync(stoppingToken);
+        Swing swing = new() { SessionId = 1, PeakGForce = peakGForce, PeakRotation = PeakRotation };
+        await _database!.InsertAsync(swing);
+
+        foreach (ImuPacket packet in data)
+        {
+            packet.SwingId = swing.Id;
+        }
+
+        await _database!.InsertAllAsync(data);
+        return swing.Id;
+    }
+
     public async Task<int> DeleteSessionAsync(int sessionId, CancellationToken stoppingToken = default)
     {
         await InitialiseAsync(stoppingToken);

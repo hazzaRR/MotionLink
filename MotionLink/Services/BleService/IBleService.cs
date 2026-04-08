@@ -8,6 +8,9 @@ namespace MotionLink.Services;
 public interface IBleService
 {
     ImuPacket LastValue {get;}
+    double PeakRotation {get;}
+    double PeakGForce { get;}
+    List<ImuPacket> SessionData { get; set; }
     ISeries[] AccelSeries { get; }
     ISeries[] GyroSeries { get; }
     object Sync { get; }
