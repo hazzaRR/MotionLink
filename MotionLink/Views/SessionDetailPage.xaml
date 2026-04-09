@@ -60,6 +60,17 @@
                                                VerticalOptions="Center" />
                                         </Grid>
                                     </SwipeItemView>
+                                    <SwipeItemView
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type views:SessionDetailPage}}, Path=BindingContext.DownloadSwingCommand}"
+                                        CommandParameter="{Binding .}">
+                                        <Grid BackgroundColor="DodgerBlue" Padding="16">
+                                            <Label Text="Download"
+                                               TextColor="White"
+                                               FontAttributes="Bold"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center" />
+                                        </Grid>
+                                    </SwipeItemView>
                                 </SwipeItems>
                             </SwipeView.LeftItems>
 

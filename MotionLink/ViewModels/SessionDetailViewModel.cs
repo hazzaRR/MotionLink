@@ -1,4 +1,6 @@
+using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core.Extensions;
+using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
@@ -113,5 +115,53 @@ public partial class SessionDetailViewModel : BaseViewModel, IQueryAttributable
             Title = "Share raw swing data",
             File = new ShareFile(file, "text/csv")
         });
+    }
+
+    [RelayCommand]
+    async Task DownloadSwing(Swing swing)
+    {
+        bool canSave = await RequestStoragePermissionsAndSaveFile();
+        if (canSave)
+        {
+            List<ImuPacket> data = await _repo.GetRawSwingDataAsync(swing.Id, default);
+            string fileName = $"{SelectedSession.Name.Replace("/", "-").Replace("\\", "-").Replace(":", "-").Replace(" ", "_")}-swing.csv";
+
+            var csvString = new StringBuilder();
+            csvString.AppendLine("timestamp,ax,ay,az,gx,gy,gz");
+
+            foreach (var packet in data)
+            {
+                csvString.AppendLine($"{packet.TimeStamp:o},{packet.Ax},{packet.Ay},{packet.Az},{packet.Gx},{packet.Gy},{packet.Gz}");
+            }
+
+            using var stream = new MemoryStream(Encoding.Default.GetBytes(csvString.ToString()));
+            var fileSaverResult = await FileSaver.Default.SaveAsync(fileName, stream);
+            if (fileSaverResult.IsSuccessful)
+            {
+                await Toast.Make($"The file was saved successfully to location: {fileSaverResult.FilePath}").Show();
+            }
+            else
+            {
+                await Toast.Make($"The file was not saved successfully with error: {fileSaverResult.Exception.Message}").Show();
+            }
+        }
+    }
+
+    private async Task<bool> RequestStoragePermissionsAndSaveFile(CancellationToken cancellationToken = default)
+    {
+        var readPermissionStatus = await Permissions.RequestAsync<Permissions.StorageRead>();
+        var writePermissionStatus = await Permissions.RequestAsync<Permissions.StorageWrite>();
+
+        if (readPermissionStatus != PermissionStatus.Granted ||
+            writePermissionStatus != PermissionStatus.Granted)
+        {
+            await Toast
+                .Make("Storage permissions are required to save files.")
+                .Show(cancellationToken);
+
+            return false;
+        }
+
+        return true;
     }
 }
