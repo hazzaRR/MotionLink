@@ -39,14 +39,25 @@
                             <SwipeView.LeftItems>
                                 <SwipeItems>
                                     <SwipeItemView
-                            Command="{Binding Source={RelativeSource AncestorType={x:Type views:SessionDetailPage}}, Path=BindingContext.DeleteSwingCommand}"
-                            CommandParameter="{Binding .}">
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type views:SessionDetailPage}}, Path=BindingContext.DeleteSwingCommand}"
+                                        CommandParameter="{Binding .}">
                                         <Grid BackgroundColor="#D32F2F" Padding="16">
                                             <Label Text="Delete"
-                                       TextColor="White"
-                                       FontAttributes="Bold"
-                                       HorizontalOptions="Center"
-                                       VerticalOptions="Center" />
+                                               TextColor="White"
+                                               FontAttributes="Bold"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center" />
+                                        </Grid>
+                                    </SwipeItemView>
+                                    <SwipeItemView
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type views:SessionDetailPage}}, Path=BindingContext.ShareSwingCommand}"
+                                        CommandParameter="{Binding .}">
+                                        <Grid BackgroundColor="Green" Padding="16">
+                                            <Label Text="Share"
+                                               TextColor="White"
+                                               FontAttributes="Bold"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center" />
                                         </Grid>
                                     </SwipeItemView>
                                 </SwipeItems>

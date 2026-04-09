@@ -50,6 +50,14 @@ public class MotionLinkRepository : IMotionLinkRepository
         return await _database!.DeleteAsync<Swing>(swingId);
     }
 
+    public async Task<List<ImuPacket>> GetRawSwingDataAsync(int swingId, CancellationToken stoppingToken = default)
+    {
+        await InitialiseAsync(stoppingToken);
+        return await _database!.Table<ImuPacket>()
+                    .Where(s => s.SwingId == swingId)
+                    .ToListAsync();
+     }
+
     public async Task<Session?> GetSessionByIdAsync(int id, CancellationToken stoppingToken = default)
     {
         await InitialiseAsync(stoppingToken);

@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO.Pipelines;
 using System.Reactive.Linq;
+using System.Text;
 using System.Xml.Linq;
 
 namespace MotionLink.ViewModels;
@@ -76,5 +77,41 @@ public partial class SessionDetailViewModel : BaseViewModel, IQueryAttributable
         //    await _navigationService.GoToSwingDetail(SelectedSwing.Id);
         //    SelectedSwing = null;
         //}
+    }
+
+    [RelayCommand]
+    async Task DeleteSwing(Swing swing)
+    {
+        await _repo.DeleteSwingAsync(swing.Id, default);
+        Swings.Remove(swing);
+    }
+
+    [RelayCommand]
+    async Task ShareSwing(Swing swing)
+    {
+        List<ImuPacket> data = await _repo.GetRawSwingDataAsync(swing.Id, default);
+        string fileName = $"{SelectedSession.Name.Replace("/", "-").Replace("\\", "-").Replace(":", "-").Replace(" ", "_")}-swing.csv";
+
+
+
+
+        string file = Path.Combine(FileSystem.CacheDirectory, fileName);
+
+        var csvString = new StringBuilder();
+        csvString.AppendLine("timestamp,ax,ay,az,gx,gy,gz");
+
+        foreach (var packet in data)
+        {
+            csvString.AppendLine($"{packet.TimeStamp:o},{packet.Ax},{packet.Ay},{packet.Az},{packet.Gx},{packet.Gy},{packet.Gz}");
+        }
+
+
+        File.WriteAllText(file, csvString.ToString());
+
+        await Share.Default.RequestAsync(new ShareFileRequest
+        {
+            Title = "Share raw swing data",
+            File = new ShareFile(file, "text/csv")
+        });
     }
 }
