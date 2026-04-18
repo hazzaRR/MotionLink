@@ -99,12 +99,17 @@ public partial class BleService : ObservableObject, IBleService
             _logger.LogInformation($"{data.Data.Length}");
             _logger.LogInformation(BitConverter.ToString(data.Data));
 
-            double rawAx = BitConverter.ToSingle(data.Data, 0);
-            double rawAy = BitConverter.ToSingle(data.Data, 4);
-            double rawAz = BitConverter.ToSingle(data.Data, 8);
-            double rawGx = BitConverter.ToSingle(data.Data, 12);
-            double rawGy = BitConverter.ToSingle(data.Data, 16);
-            double rawGz = BitConverter.ToSingle(data.Data, 20);
+            double qW = BitConverter.ToSingle(data.Data, 0);
+            double qX = BitConverter.ToSingle(data.Data, 4);
+            double qY = BitConverter.ToSingle(data.Data, 8);
+            double qZ = BitConverter.ToSingle(data.Data, 12);
+            double rawAx = BitConverter.ToSingle(data.Data, 16);
+            double rawAy = BitConverter.ToSingle(data.Data, 20);
+            double rawAz = BitConverter.ToSingle(data.Data, 24);
+            double rawGx = BitConverter.ToSingle(data.Data, 28);
+            double rawGy = BitConverter.ToSingle(data.Data, 32);
+            double rawGz = BitConverter.ToSingle(data.Data, 36);
+            bool impactDetected = BitConverter.ToBoolean(data.Data, 38);
                     
             double cleanAx = _filterAx.Compute(rawAx);
             double cleanAy = _filterAy.Compute(rawAy);
@@ -131,7 +136,7 @@ public partial class BleService : ObservableObject, IBleService
                 if (currentRot > PeakRotation) PeakRotation = currentRot;
                 // if (currentRot > PeakRotation) PeakRotation = currentRot;
 
-                LastValue = new ImuPacket { TimeStamp = DateTime.Now, Ax = cleanAx, Ay = cleanAy, Az = cleanAz, Gx = rawGx, Gy = rawGy, Gz = rawGz };
+                LastValue = new ImuPacket { TimeStamp = DateTime.Now, Ax = cleanAx, Ay = cleanAy, Az = cleanAz, Gx = rawGx, Gy = rawGy, Gz = rawGz, Qw = qW, Qx = qX, Qy = qY, Qz = qZ, Impact = impactDetected  };
 
                 SessionData.Add(LastValue);
 

@@ -16,4 +16,9 @@ public class ImuPacket
     public double Gx {get; set; }
     public double Gy {get; set; }
     public double Gz {get; set; }
+    public double Qw {get; set; }
+    public double Qx { get; set; }
+    public double Qy { get; set; }
+    public double Qz { get; set; }
+    public bool Impact { get; set; }
 }
