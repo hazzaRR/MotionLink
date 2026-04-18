@@ -10,15 +10,15 @@ public class ImuPacket
     [Indexed]
     public int SwingId {get; set; }
     public DateTime TimeStamp {get; set; }
-    public double Ax {get; set; }
-    public double Ay {get; set; }
-    public double Az {get; set; }
-    public double Gx {get; set; }
-    public double Gy {get; set; }
-    public double Gz {get; set; }
-    public double Qw {get; set; }
-    public double Qx { get; set; }
-    public double Qy { get; set; }
-    public double Qz { get; set; }
-    public bool Impact { get; set; }
+    public double Ax { get; set; } = 0;
+    public double Ay {get; set; } = 0;
+    public double Az {get; set; } = 0;
+    public double Gx {get; set; } = 0;
+    public double Gy {get; set; } = 0;
+    public double Gz {get; set; } = 0;
+    public double Qw {get; set; } = 0;
+    public double Qx { get; set; } = 0;
+    public double Qy { get; set; } = 0;
+    public double Qz { get; set; } = 0;
+    public bool Impact { get; set; } = false;
 }

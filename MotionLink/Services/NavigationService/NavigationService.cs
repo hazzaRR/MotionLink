@@ -26,7 +26,7 @@ namespace MotionLink.Services
         public async Task GoToSwingDetail(int selectedSwingId)
         {
             Dictionary<string, object> parameters = new() { { "SwingId", selectedSwingId } };
-            await Shell.Current.GoToAsync(nameof(SessionDetailPage), parameters);
+            await Shell.Current.GoToAsync(nameof(SwingDetailPage), parameters);
         }
     }
 }

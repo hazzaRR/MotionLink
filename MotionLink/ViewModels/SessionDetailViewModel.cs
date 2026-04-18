@@ -8,10 +8,7 @@ using Microsoft.Maui.Controls.Internals;
 using MotionLink.Models;
 using MotionLink.Repositories;
 using MotionLink.Services;
-using MotionLink.Views;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO.Pipelines;
 using System.Reactive.Linq;
 using System.Text;
 using System.Xml.Linq;
@@ -74,11 +71,11 @@ public partial class SessionDetailViewModel : BaseViewModel, IQueryAttributable
     [RelayCommand]
     private async Task NavigateToSelectedSwing()
     {
-        //if (SelectedSwing is not null)
-        //{
-        //    await _navigationService.GoToSwingDetail(SelectedSwing.Id);
-        //    SelectedSwing = null;
-        //}
+        if (SelectedSwing is not null)
+        {
+            await _navigationService.GoToSwingDetail(SelectedSwing.Id);
+            SelectedSwing = null;
+        }
     }
 
     [RelayCommand]

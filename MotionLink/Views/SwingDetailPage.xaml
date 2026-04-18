@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:BaseContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:MotionLink.Views"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.Maui;assembly=LiveChartsCore.SkiaSharpView.Maui"
+    x:Class="MotionLink.Views.SwingDetailPage"
+    Title="Swing">
+
+    <views:BaseContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+
+            <Style x:Key="StatCard" TargetType="Frame">
+                <!-- <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#F0F0F0, Dark=#2C2C2C}" /> -->
+                <Setter Property="CornerRadius" Value="12" />
+                <Setter Property="HasShadow" Value="True" />
+                <Setter Property="Padding" Value="15" />
+                <Setter Property="BorderColor" Value="Transparent" />
+            </Style>
+        </ResourceDictionary>
+    </views:BaseContentPage.Resources>
+
+    <Grid RowDefinitions="Auto, *">
+        <ScrollView Grid.Row="1" Padding="20">
+            <VerticalStackLayout Spacing="20">
+
+                <VerticalStackLayout Spacing="20">
+
+                    <FlexLayout JustifyContent="SpaceBetween" Wrap="Wrap">
+                        <Frame Style="{StaticResource StatCard}" WidthRequest="160" Margin="0,0,0,10">
+                            <VerticalStackLayout HorizontalOptions="Center">
+                                <Label Text="PEAK SPEED" FontSize="12" TextColor="Gray" HorizontalOptions="Center" />
+                                <Label Text="{Binding SelectedSwing.PeakRotation, StringFormat='{0:F0}°/s'}"
+                                       FontSize="24" FontAttributes="Bold" TextColor="#2196F3" />
+                            </VerticalStackLayout>
+                        </Frame>
+
+                        <Frame Style="{StaticResource StatCard}" WidthRequest="160" Margin="0,0,0,10">
+                            <VerticalStackLayout HorizontalOptions="Center">
+                                <Label Text="MAX FORCE" FontSize="12" TextColor="Gray" HorizontalOptions="Center" />
+                                <Label Text="{Binding SelectedSwing.PeakGForce, StringFormat='{0:F1} G'}"
+                                       FontSize="24" FontAttributes="Bold" TextColor="#F44336" />
+                            </VerticalStackLayout>
+                        </Frame>
+                    </FlexLayout>
+
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Accelerometer (Linear Motion)" FontAttributes="Bold" Margin="5,0" />
+                        <Frame Padding="0" HeightRequest="220" HasShadow="False" BackgroundColor="Transparent">
+                            <lvc:CartesianChart ZoomMode="X" Series="{Binding AccelSeries}"
+                                                TooltipPosition="Hidden" />
+                        </Frame>
+
+                        <Label Text="Gyroscope (Rotation)" FontAttributes="Bold" Margin="5,15,5,0" />
+                        <Frame Padding="0" HeightRequest="220" HasShadow="False" BackgroundColor="Transparent">
+                            <lvc:CartesianChart ZoomMode="X" Series="{Binding GyroSeries}"
+                                                TooltipPosition="Hidden" />
+                        </Frame>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</views:BaseContentPage>
