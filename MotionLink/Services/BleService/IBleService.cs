@@ -13,6 +13,7 @@ public interface IBleService
     List<ImuPacket> SessionData { get; set; }
     ISeries[] AccelSeries { get; }
     ISeries[] GyroSeries { get; }
+    ISeries[] QuaternionSeries { get; }
     object Sync { get; }
     IPeripheral ConnectedPeripheral {get;}
     IObservable<IPeripheral> ScanForDevices(string serviceUuid);

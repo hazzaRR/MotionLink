@@ -39,8 +39,13 @@ public partial class BleService : ObservableObject, IBleService
     private ObservableCollection<double> GyroX { get; } = new();
     private ObservableCollection<double> GyroY { get; } = new();
     private ObservableCollection<double> GyroZ { get; } = new();
+    private ObservableCollection<double> QW { get; } = new();
+    private ObservableCollection<double> QX { get; } = new();
+    private ObservableCollection<double> QY { get; } = new();
+    private ObservableCollection<double> QZ { get; } = new();
     public ISeries[] AccelSeries { get; }
     public ISeries[] GyroSeries { get; }
+    public ISeries[] QuaternionSeries { get; }
     public object Sync { get; } = new object();
     public List<ImuPacket> SessionData { get; set; } = [];
     public BleService(ILogger<BleService> logger, IBleManager bleManager)
@@ -62,6 +67,14 @@ public partial class BleService : ObservableObject, IBleService
             new LineSeries<double> { Values = GyroX, Name = "Gyro X", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Blue) { StrokeThickness = 4 }},
             new LineSeries<double> { Values = GyroY, Name = "Gyro Y", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Red) { StrokeThickness = 4 }},
             new LineSeries<double> { Values = GyroZ, Name = "Gyro Z", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Green) { StrokeThickness = 4 }}
+        ];
+        
+        QuaternionSeries =
+        [
+            new LineSeries<double> { Values = QW, Name = "W", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Orange) { StrokeThickness = 4 }},
+            new LineSeries<double> { Values = QX, Name = "X", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Blue) { StrokeThickness = 4 }},
+            new LineSeries<double> { Values = QY, Name = "Y", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Red) { StrokeThickness = 4 }},
+            new LineSeries<double> { Values = QZ, Name = "Z", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Green) { StrokeThickness = 4 }}
         ];
 
     }
@@ -148,6 +161,10 @@ public partial class BleService : ObservableObject, IBleService
                     AddPoint(GyroX, rawGx);
                     AddPoint(GyroY, rawGy);
                     AddPoint(GyroZ, rawGz);
+                    AddPoint(QW, qW);
+                    AddPoint(QX, qX);
+                    AddPoint(QY, qY);
+                    AddPoint(QZ, qZ);
                 }
             });
 

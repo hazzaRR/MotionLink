@@ -85,7 +85,7 @@ namespace MotionLink
             builder.Services.AddScoped<SensorDisplayViewModel>();
             builder.Services.AddScoped<HistoryViewModel>();
             builder.Services.AddScoped<SessionDetailViewModel>();
-            builder.Services.AddScoped<SwingDetailViewModel>();
+            builder.Services.AddTransient<SwingDetailViewModel>();
             builder.Services.AddScoped<TelemetryEndpointViewModel>();
             return builder;
         }
@@ -96,7 +96,7 @@ namespace MotionLink
             builder.Services.AddScoped<SensorDisplayView>();
             builder.Services.AddScoped<HistoryView>();
             builder.Services.AddScoped<SessionDetailPage>();
-            builder.Services.AddScoped<SwingDetailPage>();
+            builder.Services.AddTransient<SwingDetailPage>();
             builder.Services.AddScoped<TelemetryEndpointView>();
             
             return builder;

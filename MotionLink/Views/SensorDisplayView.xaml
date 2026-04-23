@@ -77,6 +77,13 @@
                                                 SyncContext="{Binding BleService.Sync}"
                                                 TooltipPosition="Hidden" />
                         </Frame>
+
+                        <Label Text="Quaternion" FontAttributes="Bold" Margin="5,15,5,0" />
+                        <Frame Padding="0" HeightRequest="220" HasShadow="False" BackgroundColor="Transparent">
+                            <lvc:CartesianChart Series="{Binding BleService.QuaternionSeries}"
+                                                SyncContext="{Binding BleService.Sync}"
+                                                TooltipPosition="Hidden" />
+                        </Frame>
                     </VerticalStackLayout>
 
                     <Button Text="Start Swing Capture"
