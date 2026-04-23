@@ -22,7 +22,7 @@ public partial class BleService : ObservableObject, IBleService
     private readonly SimpleMovingAverage _filterAz = new(5);
 
     [ObservableProperty] 
-    private double _peakRotation; // Proxy for swing speed
+    private double _peakRotation;
     [ObservableProperty]
     private double _peakGForce;
 
@@ -48,6 +48,15 @@ public partial class BleService : ObservableObject, IBleService
     public ISeries[] QuaternionSeries { get; }
     public object Sync { get; } = new object();
     public List<ImuPacket> SessionData { get; set; } = [];
+    private const int PreImpactPackets = 200;
+    private const int PostImpactPackets = 100;
+    private const int CooldownPackets = 250;
+    private readonly List<ImuPacket> _rollingBuffer = new();
+    private readonly List<ImuPacket> _currentSwing = new();
+    private bool _isCapturing = false;
+    private int _postImpactCounter = 0;
+    private int _cooldownCounter = 0;
+    private bool _isCooldown = false;
     public BleService(ILogger<BleService> logger, IBleManager bleManager)
     {
         _logger = logger;
@@ -68,7 +77,7 @@ public partial class BleService : ObservableObject, IBleService
             new LineSeries<double> { Values = GyroY, Name = "Gyro Y", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Red) { StrokeThickness = 4 }},
             new LineSeries<double> { Values = GyroZ, Name = "Gyro Z", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Green) { StrokeThickness = 4 }}
         ];
-        
+
         QuaternionSeries =
         [
             new LineSeries<double> { Values = QW, Name = "W", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Orange) { StrokeThickness = 4 }},
@@ -143,15 +152,16 @@ public partial class BleService : ObservableObject, IBleService
             // // Update a new property
             // PeakMph = mph;
 
+            ImuPacket packet = new ImuPacket { TimeStamp = DateTime.Now, Ax = cleanAx, Ay = cleanAy, Az = cleanAz, Gx = rawGx, Gy = rawGy, Gz = rawGz, Qw = qW, Qx = qX, Qy = qY, Qz = qZ, Impact = impactDetected  };
+            DetectSwing(packet);
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 if (currentG > PeakGForce) PeakGForce = currentG;
                 if (currentRot > PeakRotation) PeakRotation = currentRot;
                 // if (currentRot > PeakRotation) PeakRotation = currentRot;
 
-                LastValue = new ImuPacket { TimeStamp = DateTime.Now, Ax = cleanAx, Ay = cleanAy, Az = cleanAz, Gx = rawGx, Gy = rawGy, Gz = rawGz, Qw = qW, Qx = qX, Qy = qY, Qz = qZ, Impact = impactDetected  };
 
-                SessionData.Add(LastValue);
+                SessionData.Add(packet);
 
                 lock (Sync)
                 {
@@ -178,6 +188,51 @@ public partial class BleService : ObservableObject, IBleService
 
         if (list.Count > 100)
             list.RemoveAt(0);
+    }
+    private void DetectSwing(ImuPacket packet)
+    {
+        _rollingBuffer.Add(packet);
+        if (_rollingBuffer.Count > PreImpactPackets)
+            _rollingBuffer.RemoveAt(0);
+
+        if (_isCooldown)
+        {
+            _cooldownCounter++;
+            if (_cooldownCounter >= CooldownPackets)
+            {
+                _isCooldown = false;
+                _cooldownCounter = 0;
+            }
+            return;
+        }
+
+        if (!_isCapturing && packet.Impact)
+        {
+            _isCapturing = true;
+            _postImpactCounter = 0;
+
+            _currentSwing.Clear();
+            _currentSwing.AddRange(_rollingBuffer);
+        }
+
+        if (_isCapturing)
+        {
+            _currentSwing.Add(packet);
+            _postImpactCounter++;
+
+            if (_postImpactCounter >= PostImpactPackets)
+            {
+                _isCapturing = false;
+
+                //SaveSwing(_currentSwing);
+
+                _currentSwing.Clear();
+
+                _isCooldown = true;
+                _cooldownCounter = 0;
+            }
+        }
+
     }
 
     public void DisconnectDevice()
