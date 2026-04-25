@@ -1,14 +1,8 @@
-using System.Collections.ObjectModel;
+
 using System.Reactive.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
-using LiveChartsCore;
-using LiveChartsCore.SkiaSharpView;
-using LiveChartsCore.SkiaSharpView.Painting;
 using Microsoft.Extensions.Logging;
-using MotionLink.Models;
-using Shiny;
 using Shiny.BluetoothLE;
-using SkiaSharp;
 
 
 namespace MotionLink.Services;
@@ -17,75 +11,20 @@ public partial class BleService : ObservableObject, IBleService
 {
     private readonly ILogger<BleService> _logger;
     private readonly IBleManager _bleManager;
-    private readonly SimpleMovingAverage _filterAx = new(5);
-    private readonly SimpleMovingAverage _filterAy = new(5);
-    private readonly SimpleMovingAverage _filterAz = new(5);
-
-    [ObservableProperty] 
-    private double _peakRotation;
-    [ObservableProperty]
-    private double _peakGForce;
+    private readonly IPacketProcessingService _packetProcessingService;
+    public ISwingProcessingService SwingProcessingService {get;}
+    public ILiveChartService LiveChartService {get;}
 
     [ObservableProperty]
     private IPeripheral? _connectedPeripheral;
     public bool IsConnected => ConnectedPeripheral != null;
-
-    [ObservableProperty]
-    private ImuPacket _lastValue;
-
-    private ObservableCollection<double> AccX { get; } = new();
-    private ObservableCollection<double> AccY { get; } = new();
-    private ObservableCollection<double> AccZ { get; } = new();
-    private ObservableCollection<double> GyroX { get; } = new();
-    private ObservableCollection<double> GyroY { get; } = new();
-    private ObservableCollection<double> GyroZ { get; } = new();
-    private ObservableCollection<double> QW { get; } = new();
-    private ObservableCollection<double> QX { get; } = new();
-    private ObservableCollection<double> QY { get; } = new();
-    private ObservableCollection<double> QZ { get; } = new();
-    public ISeries[] AccelSeries { get; }
-    public ISeries[] GyroSeries { get; }
-    public ISeries[] QuaternionSeries { get; }
-    public object Sync { get; } = new object();
-    public List<ImuPacket> SessionData { get; set; } = [];
-    private const int PreImpactPackets = 200;
-    private const int PostImpactPackets = 100;
-    private const int CooldownPackets = 250;
-    private readonly List<ImuPacket> _rollingBuffer = new();
-    private readonly List<ImuPacket> _currentSwing = new();
-    private bool _isCapturing = false;
-    private int _postImpactCounter = 0;
-    private int _cooldownCounter = 0;
-    private bool _isCooldown = false;
-    public BleService(ILogger<BleService> logger, IBleManager bleManager)
+    public BleService(ILogger<BleService> logger, IBleManager bleManager, IPacketProcessingService packetProcessingService, ISwingProcessingService swingProcessingService, ILiveChartService liveChartService)
     {
         _logger = logger;
         _bleManager = bleManager;
-        
-        AccelSeries =
-        [
-
-            new LineSeries<double> { Values = AccX, Name = "Acc X", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Blue) { StrokeThickness = 4 }},
-            new LineSeries<double> { Values = AccY, Name = "Acc Y", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Red) { StrokeThickness = 4 }},
-            new LineSeries<double> { Values = AccZ, Name = "Acc Z", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Green) { StrokeThickness = 4 }},
-
-        ];
-
-        GyroSeries =
-        [
-            new LineSeries<double> { Values = GyroX, Name = "Gyro X", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Blue) { StrokeThickness = 4 }},
-            new LineSeries<double> { Values = GyroY, Name = "Gyro Y", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Red) { StrokeThickness = 4 }},
-            new LineSeries<double> { Values = GyroZ, Name = "Gyro Z", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Green) { StrokeThickness = 4 }}
-        ];
-
-        QuaternionSeries =
-        [
-            new LineSeries<double> { Values = QW, Name = "W", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Orange) { StrokeThickness = 4 }},
-            new LineSeries<double> { Values = QX, Name = "X", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Blue) { StrokeThickness = 4 }},
-            new LineSeries<double> { Values = QY, Name = "Y", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Red) { StrokeThickness = 4 }},
-            new LineSeries<double> { Values = QZ, Name = "Z", GeometrySize = 0, Stroke = new SolidColorPaint(SKColors.Green) { StrokeThickness = 4 }}
-        ];
-
+        _packetProcessingService = packetProcessingService;
+        SwingProcessingService = swingProcessingService;
+        LiveChartService = liveChartService;
     }
 
     public IObservable<IPeripheral> ScanForDevices(string serviceUuid)
@@ -121,120 +60,13 @@ public partial class BleService : ObservableObject, IBleService
             _logger.LogInformation($"{data.Data.Length}");
             _logger.LogInformation(BitConverter.ToString(data.Data));
 
-            double qW = BitConverter.ToSingle(data.Data, 0);
-            double qX = BitConverter.ToSingle(data.Data, 4);
-            double qY = BitConverter.ToSingle(data.Data, 8);
-            double qZ = BitConverter.ToSingle(data.Data, 12);
-            double rawAx = BitConverter.ToSingle(data.Data, 16);
-            double rawAy = BitConverter.ToSingle(data.Data, 20);
-            double rawAz = BitConverter.ToSingle(data.Data, 24);
-            double rawGx = BitConverter.ToSingle(data.Data, 28);
-            double rawGy = BitConverter.ToSingle(data.Data, 32);
-            double rawGz = BitConverter.ToSingle(data.Data, 36);
-            bool impactDetected = BitConverter.ToBoolean(data.Data, 38);
-                    
-            double cleanAx = _filterAx.Compute(rawAx);
-            double cleanAy = _filterAy.Compute(rawAy);
-            double cleanAz = _filterAz.Compute(rawAz);
-
-            double currentG = Math.Sqrt(cleanAx * cleanAx + cleanAy * cleanAy + cleanAz * cleanAz);
-            double currentRot = Math.Sqrt(rawGx * rawGx + rawGy * rawGy + rawGz * rawGz);
-
-            // // Convert Degrees/Second to Radians/Second
-            // double radiansPerSecond = currentRot * (Math.PI / 180);
-
-            // // Calculate Linear Speed (Meters per Second)
-            // double metersPerSecond = radiansPerSecond * 1.14;
-
-            // // Convert to MPH
-            // double mph = metersPerSecond * 2.237;
-
-            // // Update a new property
-            // PeakMph = mph;
-
-            ImuPacket packet = new ImuPacket { TimeStamp = DateTime.Now, Ax = cleanAx, Ay = cleanAy, Az = cleanAz, Gx = rawGx, Gy = rawGy, Gz = rawGz, Qw = qW, Qx = qX, Qy = qY, Qz = qZ, Impact = impactDetected  };
-            DetectSwing(packet);
-            MainThread.BeginInvokeOnMainThread(() =>
-            {
-                if (currentG > PeakGForce) PeakGForce = currentG;
-                if (currentRot > PeakRotation) PeakRotation = currentRot;
-                // if (currentRot > PeakRotation) PeakRotation = currentRot;
-
-
-                SessionData.Add(packet);
-
-                lock (Sync)
-                {
-                    AddPoint(AccX, cleanAx);
-                    AddPoint(AccY, cleanAy);
-                    AddPoint(AccZ, cleanAz);
-                    AddPoint(GyroX, rawGx);
-                    AddPoint(GyroY, rawGy);
-                    AddPoint(GyroZ, rawGz);
-                    AddPoint(QW, qW);
-                    AddPoint(QX, qX);
-                    AddPoint(QY, qY);
-                    AddPoint(QZ, qZ);
-                }
-            });
-
+            var packet = _packetProcessingService.ParseData(data.Data);
+            (double currentG, double currentRot) = _packetProcessingService.CalculateStats(packet);
+            LiveChartService.UpdateCharts(packet, currentG, currentRot);
+            SwingProcessingService.ProcessPacket(packet);
         });
         
     }
-
-    private void AddPoint(ObservableCollection<double> list, double value)
-    {
-        list.Add(value);
-
-        if (list.Count > 100)
-            list.RemoveAt(0);
-    }
-    private void DetectSwing(ImuPacket packet)
-    {
-        _rollingBuffer.Add(packet);
-        if (_rollingBuffer.Count > PreImpactPackets)
-            _rollingBuffer.RemoveAt(0);
-
-        if (_isCooldown)
-        {
-            _cooldownCounter++;
-            if (_cooldownCounter >= CooldownPackets)
-            {
-                _isCooldown = false;
-                _cooldownCounter = 0;
-            }
-            return;
-        }
-
-        if (!_isCapturing && packet.Impact)
-        {
-            _isCapturing = true;
-            _postImpactCounter = 0;
-
-            _currentSwing.Clear();
-            _currentSwing.AddRange(_rollingBuffer);
-        }
-
-        if (_isCapturing)
-        {
-            _currentSwing.Add(packet);
-            _postImpactCounter++;
-
-            if (_postImpactCounter >= PostImpactPackets)
-            {
-                _isCapturing = false;
-
-                //SaveSwing(_currentSwing);
-
-                _currentSwing.Clear();
-
-                _isCooldown = true;
-                _cooldownCounter = 0;
-            }
-        }
-
-    }
-
     public void DisconnectDevice()
     {
         ConnectedPeripheral?.CancelConnection();
