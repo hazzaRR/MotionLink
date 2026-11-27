@@ -51,17 +51,30 @@
                     <Label Text="{Binding SelectedSwing.FaceAngleDisplay}" />
                     <Label Text="{Binding SelectedSwing.TempoRatio, StringFormat='Tempo {0:F2}:1', TargetNullValue=''}" />
 
+                    <FlexLayout BindableLayout.ItemsSource="{Binding PhaseMarkers}" Wrap="Wrap">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <HorizontalStackLayout Spacing="5" Margin="0,0,12,4">
+                                    <BoxView Color="{Binding Color}" WidthRequest="8" HeightRequest="8" VerticalOptions="Center" />
+                                    <Label Text="{Binding Caption}" FontSize="12" VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+
                     <VerticalStackLayout Spacing="5">
                         <Label Text="Accelerometer (Linear Motion)" FontAttributes="Bold" Margin="5,0" />
                         <Frame Padding="0" HeightRequest="220" HasShadow="False" BackgroundColor="Transparent">
                             <lvc:CartesianChart ZoomMode="X" Series="{Binding AccelSeries}"
-                                                TooltipPosition="Hidden" />
+                                                XAxes="{Binding AccelTimeAxis}" Sections="{Binding AccelMarkers}"
+                                                AnimationsSpeed="00:00:00" TooltipPosition="Hidden" />
                         </Frame>
 
                         <Label Text="Gyroscope (Rotation)" FontAttributes="Bold" Margin="5,15,5,0" />
                         <Frame Padding="0" HeightRequest="220" HasShadow="False" BackgroundColor="Transparent">
                             <lvc:CartesianChart ZoomMode="X" Series="{Binding GyroSeries}"
-                                                TooltipPosition="Hidden" />
+                                                XAxes="{Binding GyroTimeAxis}" Sections="{Binding GyroMarkers}"
+                                                AnimationsSpeed="00:00:00" TooltipPosition="Hidden" />
                         </Frame>
                     </VerticalStackLayout>
                 </VerticalStackLayout>

@@ -91,6 +91,11 @@
                                                        TextColor="#444" />
                                                 </HorizontalStackLayout>
 
+                                                <Label Text="{Binding DurationDisplay, StringFormat='Duration {0}'}"
+                                                       FontSize="12" TextColor="#444" />
+                                                <Label Text="{Binding AverageTempoRatio, StringFormat='Average tempo {0:F2}:1', TargetNullValue='Average tempo unavailable'}"
+                                                       FontSize="12" TextColor="#444" />
+
                                                 <Border Padding="6"
                                                    BackgroundColor="#E3F2FD"
                                                    StrokeThickness="0"

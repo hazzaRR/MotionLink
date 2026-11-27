@@ -98,7 +98,8 @@ public class MotionLinkRepository : IMotionLinkRepository
         {
             await InitialiseAsync(stoppingToken);
             var sql = @"
-                SELECT s.Id, s.Name, s.DateStart, s.DateEnd, COUNT(sw.Id) as SwingCount 
+                SELECT s.Id, s.Name, s.DateStart, s.DateEnd, COUNT(sw.Id) as SwingCount,
+                       AVG(CASE WHEN sw.TempoRatio > 0 THEN sw.TempoRatio END) AS AverageTempoRatio
                 FROM Sessions s 
                 LEFT JOIN Swings sw ON sw.SessionId = s.Id 
                 GROUP BY s.Id
