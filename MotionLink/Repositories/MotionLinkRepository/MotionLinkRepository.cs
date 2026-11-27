@@ -131,6 +131,8 @@ public class MotionLinkRepository : IMotionLinkRepository
                 SwingId INTEGER,
                 Ax REAL, Ay REAL, Az REAL,
                 Gx REAL, Gy REAL, Gz REAL,
+                Qw REAL, Qx REAL, Qy REAL, Qz REAL,
+                Impact INTEGER,
                 Timestamp DATETIME,
                 FOREIGN KEY(SwingId) REFERENCES Swings(Id) ON DELETE CASCADE
             );");

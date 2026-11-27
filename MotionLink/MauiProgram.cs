@@ -63,6 +63,9 @@ namespace MotionLink
         {
             builder.Services.AddSingleton<IBleService, BleService>();
             builder.Services.AddScoped<INavigationService, NavigationService>();
+            builder.Services.AddScoped<IPacketProcessingService, PacketProcessingService>();
+            builder.Services.AddScoped<ISwingProcessingService, SwingProcessingService>();
+            builder.Services.AddScoped<ILiveChartService, LiveChartService>();
             builder.Services.AddBluetoothLE();
 
             // builder.Services.AddHttpClient<IGatewayClient, GatewayClient>(client =>

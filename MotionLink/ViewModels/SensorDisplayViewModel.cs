@@ -83,8 +83,8 @@ public partial class SensorDisplayViewModel : BaseViewModel
             if (_currentSessionId != null)
             {
                 await _repo.UpdateSessionAsync((int) _currentSessionId, $"session-{DateTime.Now}", DateTime.Now, default);
-                await _repo.CreateSwingAsync((int)_currentSessionId, BleService.PeakGForce, BleService.PeakRotation, BleService.SessionData, default);
-                BleService.SessionData = [];
+                await _repo.CreateSwingAsync((int)_currentSessionId, BleService.LiveChartService.PeakGForce, BleService.LiveChartService.PeakRotation, BleService.SwingProcessingService.SessionData, default);
+                BleService.SwingProcessingService.SessionData = [];
             }
 
             _currentSessionId = null;
