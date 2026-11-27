@@ -4,14 +4,11 @@ using Microsoft.Extensions.Logging;
 using MotionLink.Models;
 using MotionLink.Repositories;
 using MotionLink.Services;
-using Shiny.BluetoothLE;
 
 namespace MotionLink.ViewModels;
 
 public partial class SensorDisplayViewModel : BaseViewModel
 {
-    private const string ServiceUuid = "19B10000-E8F2-537E-4F6C-D104768A1214";
-    private const string RecordingUuid = "FB7A8DB8-DE34-4C6F-9F98-D1612EE35441";
     private readonly ILogger<SensorDisplayViewModel> _logger;
     private readonly IMotionLinkRepository _repo;
     private readonly INavigationService _navigationService;
@@ -105,7 +102,7 @@ public partial class SensorDisplayViewModel : BaseViewModel
             try
             {
                 BleService.SwingProcessingService.StartCapture(sessionId, club, isRightHanded);
-                await peripheral.WriteCharacteristicAsync(ServiceUuid, RecordingUuid, [0x01]);
+                await BleService.SetRecordingAsync(peripheral, true);
                 if (!ReferenceEquals(peripheral, BleService.ConnectedPeripheral))
                     throw new InvalidOperationException("Sensor disconnected during session startup.");
 
@@ -116,15 +113,13 @@ public partial class SensorDisplayViewModel : BaseViewModel
             catch
             {
                 await BleService.SwingProcessingService.StopCaptureAsync();
-                if (ReferenceEquals(peripheral, BleService.ConnectedPeripheral))
-                    BleService.DisconnectDevice();
                 await _repo.DeleteSessionAsync(sessionId);
                 throw;
             }
         }
         catch (Exception ex)
         {
-            CaptureError = "Could not start the recording session.";
+            CaptureError = "Could not start the recording session. Try Start Session again.";
             _logger.LogError(ex, "Could not start recording");
         }
         finally
@@ -146,12 +141,12 @@ public partial class SensorDisplayViewModel : BaseViewModel
             try
             {
                 if (BleService.ConnectedPeripheral is { } peripheral)
-                    await peripheral.WriteCharacteristicAsync(ServiceUuid, RecordingUuid, [0x00]);
+                    await BleService.SetRecordingAsync(peripheral, false);
             }
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "Sensor did not acknowledge stop");
-                BleService.DisconnectDevice();
+                BleService.RecoverConnection();
             }
 
             var failedWrites = await writes;

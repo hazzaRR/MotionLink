@@ -11,7 +11,14 @@ public interface IBleService : System.ComponentModel.INotifyPropertyChanged
     ILiveChartService LiveChartService {get;}
     IPeripheral ConnectedPeripheral {get;}
     bool IsConnected { get; }
+    int? ConnectedRssi { get; }
+    int? BatteryPercent { get; }
+    bool IsReconnecting { get; }
+    IObservable<ScanResult> ScanWithSignal();
+    void SetForeground(bool isForeground);
     IObservable<IPeripheral> ScanForDevices(string serviceUuid);
     Task ConnectAsync(IPeripheral peripheral);
     void DisconnectDevice();
+    void RecoverConnection();
+    Task SetRecordingAsync(IPeripheral peripheral, bool recording);
 }

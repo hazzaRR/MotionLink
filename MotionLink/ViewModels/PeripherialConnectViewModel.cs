@@ -16,19 +16,34 @@ public partial class PeripheralConnectViewModel : BaseViewModel
     public IDisposable? scanSub;
 
     [ObservableProperty]
-    private ObservableCollection<IPeripheral> _devices = new();
+    private ObservableCollection<DiscoveredPeripheral> _devices = new();
 
     [ObservableProperty]
     private bool _isScanning;
 
     private readonly INavigationService _navigationService;
 
-    private string TargetServiceUuid { get; } = "19B10000-E8F2-537E-4F6C-D104768A1214";
+    [ObservableProperty]
+    private string? _connectionError;
+
+    public partial class DiscoveredPeripheral(IPeripheral peripheral, int rssi) : ObservableObject
+    {
+        public IPeripheral Peripheral { get; } = peripheral;
+        public string? Name => Peripheral.Name;
+
+        [ObservableProperty]
+        private int _rssi = rssi;
+    }
 
     public PeripheralConnectViewModel(IBleService bleService, INavigationService navigationService)
     {
         _bleService = bleService;
         _navigationService = navigationService;
+        bleService.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(IBleService.IsConnected) && bleService.IsConnected)
+                MainThread.BeginInvokeOnMainThread(StopScan);
+        };
     }
 
     
@@ -38,20 +53,25 @@ public partial class PeripheralConnectViewModel : BaseViewModel
         if (IsScanning)
             return;
 
+        ConnectionError = null;
         Devices.Clear();
         IsScanning = true;
 
-        scanSub = BleService
-            .ScanForDevices(TargetServiceUuid)
-            .Subscribe(device =>
+        scanSub = BleService.ScanWithSignal()
+            .Subscribe(result => MainThread.BeginInvokeOnMainThread(() =>
             {
-                if (!Devices.Contains(device))
-                    Devices.Add(device);
-            });
+                if (!IsScanning) return;
 
-        // scanSub?.Dispose();
-        // scanSub = null;
-        // IsScanning = false;
+                var existing = Devices.FirstOrDefault(device => device.Peripheral.Uuid == result.Peripheral.Uuid);
+                if (existing is null)
+                    Devices.Add(new DiscoveredPeripheral(result.Peripheral, result.Rssi));
+                else
+                    existing.Rssi = result.Rssi;
+            }), _ => MainThread.BeginInvokeOnMainThread(() =>
+            {
+                ConnectionError = "Could not scan. Check Bluetooth and its permissions.";
+                StopScan();
+            }));
     }
 
     [RelayCommand]
@@ -69,11 +89,13 @@ public partial class PeripheralConnectViewModel : BaseViewModel
 
         try 
         {
-            await BleService.ConnectAsync(peripheral);
+            ConnectionError = null;
             StopScan();
+            await BleService.ConnectAsync(peripheral);
         }
         catch (Exception ex)
         {
+            ConnectionError = "Could not connect to the sensor.";
             Console.WriteLine($"Failed to connect to device with uuid: {peripheral.Uuid}, {ex}");
         }
     }

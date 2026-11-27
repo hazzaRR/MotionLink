@@ -23,6 +23,11 @@
 
         <ScrollView Grid.Row="1" Padding="15">
             <VerticalStackLayout Spacing="15">
+                <Label Text="{Binding ConnectionError}" />
+                <HorizontalStackLayout Spacing="10" IsVisible="{Binding BleService.IsReconnecting}">
+                    <Label Text="Reconnecting to your sensor…" VerticalOptions="Center" />
+                    <Button Text="Cancel" Command="{Binding DisconnectCommand}" />
+                </HorizontalStackLayout>
 
         <Border IsVisible="{Binding BleService.IsConnected}"
             BackgroundColor="#E8F5E9"
@@ -40,10 +45,8 @@
                     <Label Text="{Binding BleService.ConnectedPeripheral.Name, FallbackValue='Connected'}"
                         FontAttributes="Bold"
                         LineBreakMode="TailTruncation" />
-                    <Label Text="{Binding BleService.ConnectedPeripheral.Uuid}"
-                        FontSize="8"
-                        TextColor="Gray"
-                        LineBreakMode="CharacterWrap" />
+                    <Label Text="{Binding BleService.ConnectedRssi, StringFormat='Signal {0} dBm', TargetNullValue='Signal unavailable'}" />
+                    <Label Text="{Binding BleService.BatteryPercent, StringFormat='Battery {0}%', TargetNullValue='Battery unavailable'}" />
                 </VerticalStackLayout>
 
                 <Button Grid.Column="2"
@@ -85,11 +88,11 @@
                                         <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                                             <Label Text="{Binding Name, FallbackValue='Unknown Device'}"
                                                    FontAttributes="Bold" />
-                                            <Label Text="{Binding Uuid}" FontSize="10" TextColor="Gray" />
+                                            <Label Text="{Binding Rssi, StringFormat='Signal {0} dBm'}" FontSize="12" />
                                         </VerticalStackLayout>
                                         <Button Grid.Column="1" Text="Connect"
                                                 Command="{Binding BindingContext.ConnectCommand, Source={x:Reference perphPage}}"
-                                                CommandParameter="{Binding .}"
+                                                CommandParameter="{Binding Peripheral}"
                                                 BackgroundColor="#2196F3" HeightRequest="40" CornerRadius="20" />
                                     </Grid>
                                 </Border>
