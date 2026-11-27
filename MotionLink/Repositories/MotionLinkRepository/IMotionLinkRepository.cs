@@ -13,5 +13,6 @@ public interface IMotionLinkRepository
     Task<int> DeleteSessionAsync(int sessionId, CancellationToken stoppingToken = default);
     Task<int> DeleteSwingAsync(int swingId, CancellationToken stoppingToken = default);
     Task<List<ImuPacket>> GetRawSwingDataAsync(int swingId, CancellationToken stoppingToken = default);
+    Task SaveDetectedSwingAsync(Swing swing);
     Task<int> CreateSwingAsync(int sessionId, double peakGForce, double PeakRotation, List<ImuPacket> data, CancellationToken stoppingToken = default);
 }

@@ -4,6 +4,7 @@ namespace MotionLink.Services;
 
 public interface ISwingProcessingService
 {
-    List<ImuPacket> SessionData { get; set; }
+    void StartCapture(int sessionId);
+    Task<int> StopCaptureAsync();
     void ProcessPacket(ImuPacket packet);
 }

@@ -4,125 +4,102 @@
 #include "Wire.h"
 
 struct __attribute__((packed)) ImuPacket {
-    float qw, qx, qy, qz; // Quaternions
-    float ax, ay, az;     // Raw Accel
-    float gx, gy, gz;     // Raw Gyro
-    uint8_t impact;       // 1 if hit detected, 0 otherwise
+    uint32_t timestampMs;
+    int16_t ax, ay, az;
+    int16_t gx, gy, gz;
+    int16_t qw, qx, qy, qz;
 };
+static_assert(sizeof(ImuPacket) == 24, "Unexpected telemetry packet size");
 
-ImuPacket sensorData;
-Mahony filter;
-
+constexpr unsigned long sampleIntervalUs = 5000;
+constexpr unsigned long ledBlinkIntervalMs = 500;
+unsigned long lastSampleUs;
+unsigned long lastLedToggleMs;
 bool isRecording = false;
-
-unsigned long previousMillis = 0;
-const long interval = 500;
-
-unsigned long lastSensorUpdate = 0;
-const long sensorInterval = 10;
+Mahony filter;
+LSM6DS3 imu(I2C_MODE, 0x6A);
 
 BLEService motionLinkService("19B10000-E8F2-537E-4F6C-D104768A1214");
 BLECharacteristic dataChar("36151377-DDD7-4C2F-9207-0724C52C3CCC", BLENotify, sizeof(ImuPacket));
 BLEByteCharacteristic switchCharacteristic("FB7A8DB8-DE34-4C6F-9F98-D1612EE35441", BLEWrite | BLERead);
 
+int16_t encode(float value, float scale) {
+    return (int16_t)constrain(lroundf(value * scale), -32768L, 32767L);
+}
+
 void onSwitchCharacteristicWritten(BLEDevice central, BLECharacteristic characteristic) {
-    if (switchCharacteristic.value() == 0x01) {
-        isRecording = true;
-        filter.begin(100); // Reset orientation on start
-        Serial.println("Recording Started via Callback");
-    } else {
-        isRecording = false;
-        Serial.println("Recording Stopped via Callback");
+    isRecording = switchCharacteristic.value() == 1;
+    if (isRecording) {
+        filter.begin(200);
+        lastSampleUs = micros();
     }
 }
 
-LSM6DS3 imu(I2C_MODE, 0x6A);
-
 void setup() {
     Serial.begin(9600);
-    imu.begin();
-    BLE.begin();
-
-    filter.begin(100);
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, HIGH);
+    imu.settings.accelRange = 16;
+    imu.settings.gyroRange = 2000;
+    imu.settings.accelSampleRate = 416;
+    imu.settings.gyroSampleRate = 416;
+    if (imu.begin() != 0 || !BLE.begin()) {
+        Serial.println("IMU or BLE initialization failed");
+        while (true) delay(1000);
+    }
 
     BLE.setLocalName("MotionLink");
     BLE.setAdvertisedService(motionLinkService);
     motionLinkService.addCharacteristic(dataChar);
     motionLinkService.addCharacteristic(switchCharacteristic);
     BLE.addService(motionLinkService);
-    BLE.advertise();
-
-    pinMode(LED_BUILTIN, OUTPUT);
-
+    switchCharacteristic.writeValue((uint8_t)0);
     switchCharacteristic.setEventHandler(BLEWritten, onSwitchCharacteristicWritten);
-    Serial.println("Golf Swing Analyser Ready");
+    BLE.advertise();
+    lastLedToggleMs = millis();
 }
 
 void loop() {
     BLEDevice central = BLE.central();
-    
-    if (central) {
-    //   Serial.println(central.address());
-        digitalWrite(LED_BUILTIN, LOW);
-
-        while (central.connected()) {
-            // Serial.println("Device connected");
-            BLE.poll();
-            //Serial.println(isRecording);
-            if (isRecording) {
-                unsigned long currentMillis = millis();
-                // Serial.println("Device recording");
-                
-                // Only send data if the interval has passed
-                if (currentMillis - lastSensorUpdate >= sensorInterval) {
-                //   Serial.println("reading data");
-                    lastSensorUpdate = currentMillis;
-
-                    // Read sensors
-                    sensorData.ax = imu.readFloatAccelX();
-                    sensorData.ay = imu.readFloatAccelY();
-                    sensorData.az = imu.readFloatAccelZ();
-                    sensorData.gx = imu.readFloatGyroX();
-                    sensorData.gy = imu.readFloatGyroY();
-                    sensorData.gz = imu.readFloatGyroZ();
-
-                    // Serial.print("AX: "); Serial.print(sensorData.ax);
-                    // Serial.print(" AY: "); Serial.print(sensorData.ay);
-                    // Serial.print(" AZ: "); Serial.print(sensorData.az);
-                    // Serial.print(" GX: "); Serial.print(sensorData.gx);
-                    // Serial.print(" GY: "); Serial.print(sensorData.gy);
-                    // Serial.print(" GZ: "); Serial.println(sensorData.gz);
-
-                    filter.updateIMU(sensorData.gx, sensorData.gy, sensorData.gz, 
-                    sensorData.ax, sensorData.ay, sensorData.az);
-
-                    sensorData.qw = filter.getW();
-                    sensorData.qx = filter.getX();
-                    sensorData.qy = filter.getY();
-                    sensorData.qz = filter.getZ();
-
-                    float accelMag = sqrt(sq(sensorData.ax) + sq(sensorData.ay) + sq(sensorData.az));
-                    if (accelMag > 12.0) {
-                        sensorData.impact = 1;
-                    } else {
-                        sensorData.impact = 0;
-                    }
-
-                    // Send data
-                    dataChar.writeValue((byte*)&sensorData, sizeof(sensorData));
-                }
-            }
-        }
-        // Reset state on disconnect
-        isRecording = false;
-
-    } else {
-        // Blinking logic for advertising mode
-        Serial.println("awaiting device");
-        unsigned long currentMillis = millis();
-        if (currentMillis - previousMillis >= interval) {
-            previousMillis = currentMillis;
+    if (!central) {
+        unsigned long now = millis();
+        if (now - lastLedToggleMs >= ledBlinkIntervalMs) {
+            lastLedToggleMs = now;
             digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
         }
+        return;
     }
+
+    digitalWrite(LED_BUILTIN, LOW);
+
+    while (central.connected()) {
+        BLE.poll();
+        unsigned long now = micros();
+        unsigned long elapsed = now - lastSampleUs;
+        if (!isRecording || elapsed < sampleIntervalUs) continue;
+
+        lastSampleUs += (elapsed / sampleIntervalUs) * sampleIntervalUs;
+        uint32_t timestamp = millis();
+        float ax = imu.readFloatAccelX();
+        float ay = imu.readFloatAccelY();
+        float az = imu.readFloatAccelZ();
+        float gx = imu.readFloatGyroX();
+        float gy = imu.readFloatGyroY();
+        float gz = imu.readFloatGyroZ();
+        filter.updateIMU(gx, gy, gz, ax, ay, az);
+
+        ImuPacket packet = {
+            timestamp,
+            encode(ax, 2048), encode(ay, 2048), encode(az, 2048),
+            encode(gx, 16), encode(gy, 16), encode(gz, 16),
+            encode(filter.getW(), 32767), encode(filter.getX(), 32767),
+            encode(filter.getY(), 32767), encode(filter.getZ(), 32767)
+        };
+        dataChar.writeValue((byte*)&packet, sizeof(packet));
+    }
+
+    isRecording = false;
+    switchCharacteristic.writeValue((uint8_t)0);
+    digitalWrite(LED_BUILTIN, HIGH);
+    lastLedToggleMs = millis();
 }

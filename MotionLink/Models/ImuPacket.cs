@@ -10,6 +10,7 @@ public class ImuPacket
     [Indexed]
     public int SwingId {get; set; }
     public DateTime TimeStamp {get; set; }
+    public long? SensorTimestampMs { get; set; }
     public double Ax { get; set; } = 0;
     public double Ay {get; set; } = 0;
     public double Az {get; set; } = 0;

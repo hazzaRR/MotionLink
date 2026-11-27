@@ -43,6 +43,7 @@
                     <Button Text="Connect Sensor" Command="{Binding NavigateToConnectCommand}" />
                 </VerticalStackLayout>
 
+                <Label Text="{Binding CaptureError}" />
                 <VerticalStackLayout Spacing="20" IsVisible="{Binding BleService.IsConnected}">
 
                     <FlexLayout JustifyContent="SpaceBetween" Wrap="Wrap">
@@ -86,12 +87,12 @@
                         </Frame>
                     </VerticalStackLayout>
 
-                    <Button Text="Start Swing Capture"
+                    <Button Text="Start Session"
                             Command="{Binding CaptureDataCommand}"
                             IsVisible="{Binding IsCapturing, Converter={StaticResource InvertedBoolConverter}}"
                             CornerRadius="25" HeightRequest="50" />
 
-                    <Button Text="Stop &amp; Save Session"
+                    <Button Text="End Session"
                             Command="{Binding PauseDataCommand}"
                             IsVisible="{Binding IsCapturing}"
                             BackgroundColor="#D32F2F" CornerRadius="25" HeightRequest="50" />

@@ -12,4 +12,12 @@ public class Swing
     public List<ImuPacket> Data { get; set; } = [];
     public double PeakRotation { get; set; }
     public double PeakGForce { get; set; }
+    public DateTime? AddressTime { get; set; }
+    public DateTime? TakeawayTime { get; set; }
+    public DateTime? TopTime { get; set; }
+    public DateTime? ImpactTime { get; set; }
+    public DateTime? FinishTime { get; set; }
+    public double? BackswingDurationMs { get; set; }
+    public double? DownswingDurationMs { get; set; }
+    public double? TempoRatio { get; set; }
 }

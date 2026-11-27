@@ -31,7 +31,7 @@
                     <FlexLayout JustifyContent="SpaceBetween" Wrap="Wrap">
                         <Frame Style="{StaticResource StatCard}" WidthRequest="160" Margin="0,0,0,10">
                             <VerticalStackLayout HorizontalOptions="Center">
-                                <Label Text="PEAK SPEED" FontSize="12" TextColor="Gray" HorizontalOptions="Center" />
+                                <Label Text="PEAK ROTATION" FontSize="12" TextColor="Gray" HorizontalOptions="Center" />
                                 <Label Text="{Binding SelectedSwing.PeakRotation, StringFormat='{0:F0}°/s'}"
                                        FontSize="24" FontAttributes="Bold" TextColor="#2196F3" />
                             </VerticalStackLayout>
@@ -45,6 +45,8 @@
                             </VerticalStackLayout>
                         </Frame>
                     </FlexLayout>
+
+                    <Label Text="{Binding SelectedSwing.TempoRatio, StringFormat='Tempo {0:F2}:1', TargetNullValue=''}" />
 
                     <VerticalStackLayout Spacing="5">
                         <Label Text="Accelerometer (Linear Motion)" FontAttributes="Bold" Margin="5,0" />
