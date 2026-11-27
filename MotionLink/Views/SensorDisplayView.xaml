@@ -46,10 +46,29 @@
                 <Label Text="{Binding CaptureError}" />
                 <VerticalStackLayout Spacing="20" IsVisible="{Binding BleService.IsConnected}">
 
+                    <Picker Title="Club"
+                            ItemsSource="{Binding Clubs}"
+                            ItemDisplayBinding="{Binding Name}"
+                            SelectedItem="{Binding SelectedClub}"
+                            IsEnabled="{Binding IsCapturing, Converter={StaticResource InvertedBoolConverter}}" />
+
+                    <HorizontalStackLayout Spacing="10"
+                                           IsVisible="{Binding IsCapturing, Converter={StaticResource InvertedBoolConverter}}">
+                        <Label Text="Right-handed" VerticalOptions="Center" />
+                        <Switch IsToggled="{Binding IsRightHanded}" />
+                    </HorizontalStackLayout>
+
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="{Binding LastSavedSwing.ClubheadSpeedDisplay}" />
+                        <Label Text="{Binding LastSavedSwing.TempoRatio, StringFormat='Tempo {0:F2}:1', TargetNullValue=''}" />
+                        <Label Text="{Binding LastSavedSwing.FaceAngleDisplay}" />
+                        <Label Text="{Binding LastSavedSwing.PeakGForce, StringFormat='Swing peak {0:F1} g', TargetNullValue=''}" />
+                    </VerticalStackLayout>
+
                     <FlexLayout JustifyContent="SpaceBetween" Wrap="Wrap">
                         <Frame Style="{StaticResource StatCard}" WidthRequest="160" Margin="0,0,0,10">
                             <VerticalStackLayout HorizontalOptions="Center">
-                                <Label Text="PEAK SPEED" FontSize="12" TextColor="Gray" HorizontalOptions="Center" />
+                                <Label Text="PEAK ROTATION" FontSize="12" TextColor="Gray" HorizontalOptions="Center" />
                                 <Label Text="{Binding BleService.LiveChartService.PeakRotation, StringFormat='{0:F0}°/s'}"
                                        FontSize="24" FontAttributes="Bold" TextColor="#2196F3" />
                             </VerticalStackLayout>

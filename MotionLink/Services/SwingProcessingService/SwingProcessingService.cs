@@ -7,6 +7,11 @@ namespace MotionLink.Services;
 
 public partial class SwingProcessingService : ISwingProcessingService
 {
+    private const double ArmOffsetMetres = 0.60;
+    private const double SpeedCalibrationFactor = 1.0;
+    // Mount with the sensor's +X axis pointing down the shaft toward the clubhead.
+    private static readonly Vector3 ShaftAxis = Vector3.UnitX;
+
     private enum Phase { SeekingAddress, Address, Backswing, Downswing, FollowThrough }
 
     private readonly object _gate = new();
@@ -14,6 +19,11 @@ public partial class SwingProcessingService : ISwingProcessingService
     private readonly Queue<ImuPacket> _stillSamples = new();
     private Phase _phase;
     private int? _sessionId;
+    private (int Id, string Name, double ShaftLengthInches, bool IsRightHanded)? _club;
+    private ImuPacket? _addressSample;
+    private ImuPacket? _impactSample;
+
+    public event Action<Swing>? SwingSaved;
     private ImuPacket? _previous;
     private double _elapsedMs;
     private double _addressMs, _takeawayMs, _topMs, _impactMs;
@@ -35,10 +45,20 @@ public partial class SwingProcessingService : ISwingProcessingService
     {
         lock (_gate)
         {
+            _club = null;
             _sessionId = sessionId;
             _previous = null;
             _elapsedMs = 0;
             ResetDetection();
+        }
+    }
+
+    public void StartCapture(int sessionId, Club club, bool isRightHanded)
+    {
+        lock (_gate)
+        {
+            StartCapture(sessionId);
+            _club = (club.Id, club.Name, club.ShaftLengthInches, isRightHanded);
         }
     }
 
@@ -48,6 +68,7 @@ public partial class SwingProcessingService : ISwingProcessingService
         lock (_gate)
         {
             _sessionId = null;
+            _club = null;
             ResetDetection();
             writes = _pendingWrites;
         }
@@ -103,6 +124,7 @@ public partial class SwingProcessingService : ISwingProcessingService
                     {
                         _addressMs = _elapsedMs;
                         _addressTime = packet.TimeStamp;
+                        _addressSample = packet;
                         while ((packet.TimeStamp - _samples[0].TimeStamp).TotalMilliseconds > 550)
                             _samples.RemoveAt(0);
                     }
@@ -135,6 +157,7 @@ public partial class SwingProcessingService : ISwingProcessingService
                         packet.Impact = true;
                         _impactMs = _elapsedMs;
                         _impactTime = packet.TimeStamp;
+                        _impactSample = packet;
                         _phase = Phase.FollowThrough;
                     }
                     break;
@@ -175,6 +198,7 @@ public partial class SwingProcessingService : ISwingProcessingService
         _samples.AddRange(_stillSamples);
         _stillSamples.Clear();
         _addressTime = packet.TimeStamp;
+        _addressSample = packet;
         _addressMs = _elapsedMs;
         _phase = Phase.Address;
     }
@@ -197,8 +221,39 @@ public partial class SwingProcessingService : ISwingProcessingService
                 Math.Sqrt(sample.Gx * sample.Gx + sample.Gy * sample.Gy + sample.Gz * sample.Gz)),
             Data = [.. _samples]
         };
+        if (_club is { } club && _impactSample is { } impact && _addressSample is { } address)
+        {
+            swing.ClubId = club.Id;
+            swing.ClubName = club.Name;
+            swing.ShaftLengthInches = club.ShaftLengthInches;
+            swing.IsRightHanded = club.IsRightHanded;
+
+            double impactRotation = Math.Sqrt(impact.Gx * impact.Gx + impact.Gy * impact.Gy + impact.Gz * impact.Gz);
+            double radius = club.ShaftLengthInches * 0.0254 + ArmOffsetMetres;
+            swing.ClubheadSpeedMps = impactRotation * (Math.PI / 180) * radius * SpeedCalibrationFactor;
+            swing.FaceAngleDriftDeg = CalculateFaceDrift(address, impact, club.IsRightHanded);
+        }
+
         _pendingWrites = SaveSwingAsync(_pendingWrites, swing);
         ResetDetection();
+    }
+
+    private static double? CalculateFaceDrift(ImuPacket address, ImuPacket impact, bool isRightHanded)
+    {
+        var baseline = new Quaternion((float)address.Qx, (float)address.Qy, (float)address.Qz, (float)address.Qw);
+        var atImpact = new Quaternion((float)impact.Qx, (float)impact.Qy, (float)impact.Qz, (float)impact.Qw);
+        if (baseline.LengthSquared() is not (> 0.5f and < 1.5f) ||
+            atImpact.LengthSquared() is not (> 0.5f and < 1.5f))
+            return null;
+
+        var relative = Quaternion.Conjugate(Quaternion.Normalize(baseline)) * Quaternion.Normalize(atImpact);
+        double shaftComponent = Vector3.Dot(new Vector3(relative.X, relative.Y, relative.Z), ShaftAxis);
+        // Twist is undefined for a 180-degree rotation entirely perpendicular to the shaft.
+        if (shaftComponent * shaftComponent + relative.W * relative.W < 1e-8) return null;
+
+        double degrees = 2 * Math.Atan2(shaftComponent, relative.W) * (180 / Math.PI);
+        degrees = Math.IEEERemainder(degrees, 360);
+        return (isRightHanded ? degrees : -degrees);
     }
 
     private async Task SaveSwingAsync(Task previousWrite, Swing swing)
@@ -212,7 +267,10 @@ public partial class SwingProcessingService : ISwingProcessingService
         {
             Interlocked.Increment(ref _failedWrites);
             _logger.LogError(ex, "Could not save swing for session {SessionId}", swing.SessionId);
+            return;
         }
+
+        SwingSaved?.Invoke(swing);
     }
 
     private void ResetDetection()
@@ -221,6 +279,8 @@ public partial class SwingProcessingService : ISwingProcessingService
         _stillSamples.Clear();
         _samples.Clear();
         _quietSinceMs = null;
+        _addressSample = null;
+        _impactSample = null;
     }
 
     private static double Acceleration(ImuPacket sample)

@@ -20,4 +20,24 @@ public class Swing
     public double? BackswingDurationMs { get; set; }
     public double? DownswingDurationMs { get; set; }
     public double? TempoRatio { get; set; }
+    public int? ClubId { get; set; }
+    public string? ClubName { get; set; }
+    public double? ShaftLengthInches { get; set; }
+    public bool? IsRightHanded { get; set; }
+    public double? ClubheadSpeedMps { get; set; }
+    public double? FaceAngleDriftDeg { get; set; }
+
+    [Ignore]
+    public string? ClubheadSpeedDisplay => ClubheadSpeedMps is double speed
+        ? $"Estimated clubhead speed  {speed / 0.44704:F1} mph"
+        : null;
+
+    [Ignore]
+    public string? FaceAngleDisplay => FaceAngleDriftDeg switch
+    {
+        > 0 => $"Face drift  {FaceAngleDriftDeg.Value:F1}° open",
+        < 0 => $"Face drift  {-FaceAngleDriftDeg.Value:F1}° closed",
+        0 => "Face drift  0.0°",
+        _ => "Face drift unavailable"
+    };
 }

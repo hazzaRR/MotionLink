@@ -39,6 +39,12 @@ public class MotionLinkRepository : IMotionLinkRepository
         return swing.Id;
     }
 
+    public async Task<List<Club>> GetBagClubsAsync()
+    {
+        await InitialiseAsync();
+        return await _database!.Table<Club>().Where(club => club.IsInBag).OrderBy(club => club.Id).ToListAsync();
+    }
+
     public async Task SaveDetectedSwingAsync(Swing swing)
     {
         await InitialiseAsync();
@@ -160,6 +166,28 @@ public class MotionLinkRepository : IMotionLinkRepository
             // Add the new columns to existing installations and retain the foreign keys above.
             await database.CreateTableAsync<Swing>();
             await database.CreateTableAsync<ImuPacket>();
+            await database.CreateTableAsync<Club>();
+            await database.RunInTransactionAsync(connection =>
+            {
+                if (connection.Table<Club>().Count() != 0) return;
+
+                connection.InsertAll(new Club[]
+                {
+                    new() { Name = "Driver", Category = "Wood", ShaftLengthInches = 45.5 },
+                    new() { Name = "3-Wood", Category = "Wood", ShaftLengthInches = 43 },
+                    new() { Name = "4-Iron", Category = "Iron", ShaftLengthInches = 38.5 },
+                    new() { Name = "5-Iron", Category = "Iron", ShaftLengthInches = 38 },
+                    new() { Name = "6-Iron", Category = "Iron", ShaftLengthInches = 37.5 },
+                    new() { Name = "7-Iron", Category = "Iron", ShaftLengthInches = 37 },
+                    new() { Name = "8-Iron", Category = "Iron", ShaftLengthInches = 36.5 },
+                    new() { Name = "9-Iron", Category = "Iron", ShaftLengthInches = 36 },
+                    new() { Name = "Pitching Wedge", Category = "Wedge", ShaftLengthInches = 35.75 },
+                    new() { Name = "Gap Wedge", Category = "Wedge", ShaftLengthInches = 35.5 },
+                    new() { Name = "Sand Wedge", Category = "Wedge", ShaftLengthInches = 35.25 },
+                    new() { Name = "Lob Wedge", Category = "Wedge", ShaftLengthInches = 35 },
+                    new() { Name = "Putter", Category = "Putter", ShaftLengthInches = 34 }
+                }, runInTransaction: false);
+            });
             _database = database;
         }
         finally

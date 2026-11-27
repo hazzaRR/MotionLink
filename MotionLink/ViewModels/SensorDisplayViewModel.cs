@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
+using MotionLink.Models;
 using MotionLink.Repositories;
 using MotionLink.Services;
 using Shiny.BluetoothLE;
@@ -26,6 +27,20 @@ public partial class SensorDisplayViewModel : BaseViewModel
     [ObservableProperty]
     private string? _captureError;
 
+    [ObservableProperty]
+    private IReadOnlyList<Club> _clubs = Array.Empty<Club>();
+
+    [ObservableProperty]
+    private Club? _selectedClub;
+
+    [ObservableProperty]
+    private bool _isRightHanded = Preferences.Default.Get("SwingRightHanded", true);
+
+    [ObservableProperty]
+    private Swing? _lastSavedSwing;
+
+    partial void OnIsRightHandedChanged(bool value) => Preferences.Default.Set("SwingRightHanded", value);
+
     public SensorDisplayViewModel(ILogger<SensorDisplayViewModel> logger, IBleService bleService,
         IMotionLinkRepository repo, INavigationService navigationService)
     {
@@ -33,6 +48,13 @@ public partial class SensorDisplayViewModel : BaseViewModel
         _bleService = bleService;
         _repo = repo;
         _navigationService = navigationService;
+        bleService.SwingProcessingService.SwingSaved += swing =>
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                if (swing.SessionId == _currentSessionId)
+                    LastSavedSwing = swing;
+            });
+
         bleService.PropertyChanged += (_, args) =>
         {
             if (args.PropertyName == nameof(IBleService.IsConnected) && !bleService.IsConnected)
@@ -44,7 +66,13 @@ public partial class SensorDisplayViewModel : BaseViewModel
     {
         try
         {
-            await _repo.InitialiseAsync();
+            if (IsCapturing) return;
+
+            int? selectedId = SelectedClub?.Id;
+            Clubs = await _repo.GetBagClubsAsync();
+            SelectedClub = Clubs.FirstOrDefault(club => club.Id == selectedId)
+                ?? Clubs.FirstOrDefault(club => club.Name == "7-Iron")
+                ?? Clubs.FirstOrDefault();
         }
         catch (Exception ex)
         {
@@ -65,15 +93,23 @@ public partial class SensorDisplayViewModel : BaseViewModel
             var peripheral = BleService.ConnectedPeripheral;
             if (_currentSessionId.HasValue || peripheral is null) return;
 
+            if (SelectedClub is not { ShaftLengthInches: > 0 } club)
+            {
+                CaptureError = "Select a club before starting the session.";
+                return;
+            }
+
+            bool isRightHanded = IsRightHanded;
             CaptureError = null;
             var sessionId = await _repo.CreateSessionAsync(DateTime.Now);
             try
             {
-                BleService.SwingProcessingService.StartCapture(sessionId);
+                BleService.SwingProcessingService.StartCapture(sessionId, club, isRightHanded);
                 await peripheral.WriteCharacteristicAsync(ServiceUuid, RecordingUuid, [0x01]);
                 if (!ReferenceEquals(peripheral, BleService.ConnectedPeripheral))
                     throw new InvalidOperationException("Sensor disconnected during session startup.");
 
+                LastSavedSwing = null;
                 _currentSessionId = sessionId;
                 IsCapturing = true;
             }

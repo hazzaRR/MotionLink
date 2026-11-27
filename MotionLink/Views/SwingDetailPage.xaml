@@ -46,6 +46,9 @@
                         </Frame>
                     </FlexLayout>
 
+                    <Label Text="{Binding SelectedSwing.ClubName}" />
+                    <Label Text="{Binding SelectedSwing.ClubheadSpeedDisplay}" />
+                    <Label Text="{Binding SelectedSwing.FaceAngleDisplay}" />
                     <Label Text="{Binding SelectedSwing.TempoRatio, StringFormat='Tempo {0:F2}:1', TargetNullValue=''}" />
 
                     <VerticalStackLayout Spacing="5">
