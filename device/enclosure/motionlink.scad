@@ -168,17 +168,26 @@ module grip_thread() {
 }
 
 module mount(threaded) {
-    seat_height = 5.6;
+    seat_height = 6.4;
     center_height = seat_height - seat_dish;
+    nut_slot_start = 2;
+    nut_slot_height = 2.65;
+    nut_slot_width = 5.76;
     union() {
         difference() {
             rotate_extrude()
                 polygon([[0, 0], [seat_diameter / 2 - 0.5, 0],
                          [seat_diameter / 2, 0.5], [seat_diameter / 2, seat_height - 0.35],
                          [seat_diameter / 2 - 0.35, seat_height], [0, center_height]]);
-            // M3 nut, nominal 5.5 mm across flats, inserted from the case side.
-            translate([0, 0, -eps]) cylinder(d = 6.65, h = 2.8 + eps, $fn = 6);
-            translate([0, 0, -eps]) cylinder(d = 3.4, h = 4.0 + eps);
+            // Load the M3 hex nut from the side. The tray-facing plate
+            // retains it when the screw is pulled toward the tray.
+            translate([0, 0, nut_slot_start]) {
+                cylinder(d = 6.65, h = nut_slot_height, $fn = 6);
+                translate([0, -nut_slot_width / 2, 0])
+                    cube([seat_diameter / 2 + eps, nut_slot_width, nut_slot_height]);
+            }
+            translate([0, 0, -eps])
+                cylinder(d = 3.4, h = nut_slot_start + nut_slot_height + eps);
         }
         if (threaded)
             translate([0, 0, center_height - eps]) grip_thread();
