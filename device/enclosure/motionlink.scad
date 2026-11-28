@@ -2,8 +2,7 @@
 part = "tray"; // [tray,lid,wired_tray,wired_lid,gauges,mount,smooth_mount]
 
 wired_enclosure = part == "wired_tray" || part == "wired_lid";
-wire_space = 3.5;
-wired_headroom = 5;
+wire_space = 5;
 
 // Grip and replaceable mount
 plug_major = 3.1;
@@ -22,7 +21,7 @@ back = -16.5;
 front = 14 + (wired_enclosure ? wire_space : 0);
 wall = 1.6;
 floor_height = 3.6;
-rim = 14.4 + (wired_enclosure ? wired_headroom : 0);
+rim = 14.4;
 lid_height = wired_enclosure ? 2.2 : 1.8;
 corner = 3;
 
@@ -48,7 +47,6 @@ boss_diameter = wired_enclosure ? 5.8 : 4.4;
 pilot_diameter = wired_enclosure ? 2.65 : 1.65;
 pilot_depth = wired_enclosure ? 8.2 : 5.2;
 lid_clearance = wired_enclosure ? 3.4 : 2.25;
-switch_body_clearance = wired_enclosure ? 5.4 : 3.9;
 
 module outline(inset = 0) {
     hull()
@@ -117,8 +115,7 @@ module lid() {
             // Capture the metal switch body vertically.
             translate([right - switch_wall - 3.5,
                        switch_y - switch_pocket_length / 2 + 0.35, lid_height - eps])
-                cube([3.2, switch_pocket_length - 0.7,
-                      rim - switch_shelf - switch_body_clearance + eps]);
+                cube([3.2, switch_pocket_length - 0.7, rim - switch_shelf - 3.9 + eps]);
         }
         screw_holes(lid_clearance, -eps, lid_height + 2 * eps);
     }

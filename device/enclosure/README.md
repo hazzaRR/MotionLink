@@ -19,13 +19,13 @@ Use the Ender-3 V3 Plus PLA profile with the stock 0.4 mm nozzle. Start at 0.12 
 
 ## Housing for the current soldered assembly
 
-Use [tray-wired.stl](tray-wired.stl) with [lid-wired.stl](lid-wired.stl). This revision adds 3.5 mm at the USB-C end for the battery leads and 5 mm above the tray rim for the taller stack. The USB-C opening is wider to accommodate the cable plug. The switch shelf and actuator position match the first print. Transfer the tested grip mount using the same M3 fastener.
+Use [tray-wired.stl](tray-wired.stl) with [lid-wired.stl](lid-wired.stl). This revision extends the tray 5 mm at the USB-C end so the battery leads can sit in front of the board. The tray rim is 14.4 mm high, matching the original tray. The USB-C opening is wider to accommodate the cable plug. The switch shelf and actuator position match the first print. Transfer the tested grip mount using the same M3 fastener.
 
 Lay the battery leads in the space in front of the board and below the USB-C connector. Check that the assembly sits without rocking, the connector stays clear, and the lid rests flat without pressing on the LiPo or trapping the leads. Test your USB-C cable and the full switch travel with the lid in place.
 
 The revised lid uses two M3 × 6–10 mm pan- or button-head screws with open pilot holes in the tray. Start the screws by hand in the empty tray and stop once snug. Tape can hold the lid for a bench fit check. Fasten the lid securely for swing testing.
 
-The revised housing measures 34 × 34 × 21.6 mm before the mount. The original tray and lid are also available above if the wiring is reworked.
+The revised housing measures 34 × 35.5 × 16.6 mm before the mount. The original tray and lid are also available above if the wiring is reworked.
 
 ## Verify HW-02
 
