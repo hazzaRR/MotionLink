@@ -1,5 +1,9 @@
 // MotionLink HW-02 prototype. Dimensions in mm. Each part is oriented for printing.
-part = "tray"; // [tray,lid,gauges,mount,smooth_mount]
+part = "tray"; // [tray,lid,wired_tray,wired_lid,gauges,mount,smooth_mount]
+
+wired_enclosure = part == "wired_tray" || part == "wired_lid";
+wire_space = 3.5;
+wired_headroom = 5;
 
 // Grip and replaceable mount
 plug_major = 3.1;
@@ -15,15 +19,15 @@ mount_center = [0, -1];
 left = -15;
 right = 19;
 back = -16.5;
-front = 14;
+front = 14 + (wired_enclosure ? wire_space : 0);
 wall = 1.6;
 floor_height = 3.6;
-rim = 14.4;
-lid_height = 1.8;
+rim = 14.4 + (wired_enclosure ? wired_headroom : 0);
+lid_height = wired_enclosure ? 2.2 : 1.8;
 corner = 3;
 
 usb_x = 0;
-usb_width = 13.5;
+usb_width = wired_enclosure ? 17.5 : 13.5;
 usb_bottom = 9.1;
 switch_y = 4.8;
 switch_shelf = 8.7;
@@ -32,10 +36,19 @@ switch_wall = 1.2;
 
 $fn = 48;
 eps = 0.02;
-boss_centers = [
+// Two diagonal M3 bosses leave the switch-side front corner and the rear
+// battery corner clear. The original housing uses four M2 bosses.
+boss_centers = wired_enclosure ? [
+    [right - 2.6, back + 2.6], [left + 2.6, front - 2.6]
+] : [
     [left + 2.4, back + 2.4], [right - 2.4, back + 2.4],
     [left + 2.4, front - 2.4], [right - 2.4, front - 2.4]
 ];
+boss_diameter = wired_enclosure ? 5.8 : 4.4;
+pilot_diameter = wired_enclosure ? 2.65 : 1.65;
+pilot_depth = wired_enclosure ? 8.2 : 5.2;
+lid_clearance = wired_enclosure ? 3.4 : 2.25;
+switch_body_clearance = wired_enclosure ? 5.4 : 3.9;
 
 module outline(inset = 0) {
     hull()
@@ -69,12 +82,17 @@ module tray() {
                 translate([0, 0, floor_height])
                     linear_extrude(rim) outline(wall);
             }
-            for (p = boss_centers)
-                translate([p[0], p[1], floor_height - eps])
-                    cylinder(d = 4.4, h = rim - floor_height + eps);
+            if (wired_enclosure) {
+                intersection() {
+                    linear_extrude(rim) outline();
+                    screw_holes(boss_diameter, floor_height - eps, rim - floor_height + eps);
+                }
+            } else {
+                screw_holes(boss_diameter, floor_height - eps, rim - floor_height + eps);
+            }
             switch_cradle();
         }
-        screw_holes(1.65, rim - 5.2, 5.2 + eps);
+        screw_holes(pilot_diameter, rim - pilot_depth, pilot_depth + eps);
         // Open-top notches let the prewired assembly drop in from above.
         translate([usb_x - usb_width / 2, front - wall - eps, usb_bottom])
             cube([usb_width, wall + 2 * eps, rim - usb_bottom + eps]);
@@ -99,9 +117,10 @@ module lid() {
             // Capture the metal switch body vertically.
             translate([right - switch_wall - 3.5,
                        switch_y - switch_pocket_length / 2 + 0.35, lid_height - eps])
-                cube([3.2, switch_pocket_length - 0.7, rim - switch_shelf - 3.9 + eps]);
+                cube([3.2, switch_pocket_length - 0.7,
+                      rim - switch_shelf - switch_body_clearance + eps]);
         }
-        screw_holes(2.25, -eps, lid_height + 2 * eps);
+        screw_holes(lid_clearance, -eps, lid_height + 2 * eps);
     }
 }
 
@@ -171,8 +190,8 @@ module mount(threaded) {
     }
 }
 
-if (part == "tray") tray();
-else if (part == "lid") mirror([0, 1, 0]) lid();
+if (part == "tray" || part == "wired_tray") tray();
+else if (part == "lid" || part == "wired_lid") mirror([0, 1, 0]) lid();
 else if (part == "mount") mount(threaded = true);
 else if (part == "smooth_mount") mount(threaded = false);
 else if (part == "gauges")

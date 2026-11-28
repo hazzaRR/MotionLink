@@ -17,9 +17,19 @@ Use the Ender-3 V3 Plus PLA profile with the stock 0.4 mm nozzle. Start at 0.12 
 2. Drop the taped assembly in with the pouch cell down, USB-C at the broad front notch and the metal switch body on its side shelf. Check wire clearance, switch travel, and that your USB-C cable can seat fully. The board and switch must stay fixed for repeatable IMU readings. If needed, use a thin, removable pad against the PCB shield to take up play. If the lid presses on the LiPo pouch, pinches a wire, or requires force to close, adjust the CAD.
 3. Flip the lid over so its raised tab is inside over the switch. Fasten it with four M2 × 6 mm screws into the printed pilot holes, taking care not to strip them.
 
+## Housing for the current soldered assembly
+
+Use [tray-wired.stl](tray-wired.stl) with [lid-wired.stl](lid-wired.stl). This revision adds 3.5 mm at the USB-C end for the battery leads and 5 mm above the tray rim for the taller stack. The USB-C opening is wider to accommodate the cable plug. The switch shelf and actuator position match the first print. Transfer the tested grip mount using the same M3 fastener.
+
+Lay the battery leads in the space in front of the board and below the USB-C connector. Check that the assembly sits without rocking, the connector stays clear, and the lid rests flat without pressing on the LiPo or trapping the leads. Test your USB-C cable and the full switch travel with the lid in place.
+
+The revised lid uses two M3 × 6–10 mm pan- or button-head screws with open pilot holes in the tray. Start the screws by hand in the empty tray and stop once snug. Tape can hold the lid for a bench fit check. Fasten the lid securely for swing testing.
+
+The revised housing measures 34 × 34 × 21.6 mm before the mount. The original tray and lid are also available above if the wiring is reworked.
+
 ## Verify HW-02
 
-Check with the empty enclosure first, then with the electronics installed. On each club, check that the case seats without rocking, resists firm hand pull and twist, and leaves no marks after removal. Repeat after several fit/removal cycles. Progress to slow practice swings in a clear area and recheck for rotation, looseness or a cracked plug. Any movement needs a mount revision before full swings. Keep the case aligned consistently relative to the clubface when transferring it between clubs. Record the threaded mount's result against the screw-in requirement.
+The first housing mounted cleanly on the wedge and 6-iron in the initial fit check. Check the revised enclosure empty first, then with the electronics installed. On each club, check that the case seats without rocking, resists firm hand pull and twist, and leaves no marks after removal. Repeat after several fit/removal cycles. Progress to slow practice swings in a clear area and recheck for rotation, looseness or a cracked plug. Any movement needs a mount revision before full swings. Keep the case aligned consistently relative to the clubface when transferring it between clubs. Record the threaded mount's result against the screw-in requirement.
 
 The supplied meshes are prototypes. Final fit depends on the measured vent and cap shape, print tolerances, and the actual dimensions of the taped assembly. If a case fit needs adjusting, measure the stack height including solder and wires, the battery envelope with tape, and the switch face location relative to the USB-C connector. [motionlink.scad](motionlink.scad) exposes the mount diameters and length, seat diameter and dish, case bounds, and opening positions. Choose a part in OpenSCAD, render with F6, and export as STL.
 
