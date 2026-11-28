@@ -4,9 +4,10 @@ HW-02 fit prototype for the Callaway grip shown in the photos. The enclosure is 
 
 ## Print the fit parts
 
-1. Open [vent-gauges.stl](vent-gauges.stl) in Creality Print in millimetres. The five separate pins are 2.6, 2.8, 3.0, 3.2 and 3.4 mm nominal diameter. Print as oriented, with the discs flat on the bed.
-2. Starting with the smallest, try each gauge by hand on every club. Record the largest gauge that enters without force, how far it goes in, and whether the cap shows any marking. Stop if the pin binds. The 4 mm pin length is a test geometry and does not imply the hole is that deep.
-3. If the gauge results are consistent with the estimated 3 mm hole, print [mount-3.1mm.stl](mount-3.1mm.stl). Start it by hand with light pressure and stop if it binds, marks the grip, or fails to seat against the cap. If the 3.1 mm mount seats without marks but pulls out or rotates easily, try [mount-3.3mm.stl](mount-3.3mm.stl) under the same conditions. Each mount has a rounded, shallow thread and a dished seat to clear the raised centre of the grip. If neither works across the clubs, use the gauge results to adjust the CAD before testing again.
+The 3.4 mm [vent gauge](vent-gauges.stl) was the best hand fit on the tested grip. Confirm the fit on each club you want to use. The five gauges range from 2.6 to 3.4 mm and have a 4 mm pin.
+
+1. Print the [3.4 mm smooth mount](mount-smooth-3.4mm.stl) to try the same pin profile with the enclosure's dished seat. Check that the seat reaches the grip cap and sits without rocking.
+2. For the screw-in HW-02 check, print the [3.6 mm shallow-thread mount](mount-threaded-3.6mm.stl). Its 3.3 mm core is slightly smaller than the tested gauge and its rounded crests reach 3.6 mm. Try it by hand with light pressure and stop if it binds, marks the grip, or fails to seat.
 
 Use the Ender-3 V3 Plus PLA profile with the stock 0.4 mm nozzle. Start at 0.12 mm layer height and solid infill for the mounts. Print the mount with the broad face down and the plug up. Leave the nut recess clear of supports. The tray and lid can also print in the supplied orientations, at 0.16–0.20 mm layer height.
 
@@ -18,7 +19,7 @@ Use the Ender-3 V3 Plus PLA profile with the stock 0.4 mm nozzle. Start at 0.12 
 
 ## Verify HW-02
 
-Check with the empty enclosure first, then with the electronics installed. On each club, check that the case seats without rocking, resists firm hand pull and twist, and leaves no marks after removal. Repeat after several fit/removal cycles. Progress to slow practice swings in a clear area and recheck for rotation, looseness or a cracked plug. Any movement needs a mount revision before full swings. Keep the case aligned consistently relative to the clubface when transferring it between clubs.
+Check with the empty enclosure first, then with the electronics installed. On each club, check that the case seats without rocking, resists firm hand pull and twist, and leaves no marks after removal. Repeat after several fit/removal cycles. Progress to slow practice swings in a clear area and recheck for rotation, looseness or a cracked plug. Any movement needs a mount revision before full swings. Keep the case aligned consistently relative to the clubface when transferring it between clubs. Record the threaded mount's result against the screw-in requirement.
 
 The supplied meshes are prototypes. Final fit depends on the measured vent and cap shape, print tolerances, and the actual dimensions of the taped assembly. If a case fit needs adjusting, measure the stack height including solder and wires, the battery envelope with tape, and the switch face location relative to the USB-C connector. [motionlink.scad](motionlink.scad) exposes the mount diameters and length, seat diameter and dish, case bounds, and opening positions. Choose a part in OpenSCAD, render with F6, and export as STL.
 

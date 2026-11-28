@@ -1,11 +1,12 @@
 // MotionLink HW-02 prototype. Dimensions in mm. Each part is oriented for printing.
-part = "tray"; // [tray,lid,gauges,mount]
+part = "tray"; // [tray,lid,gauges,mount,smooth_mount]
 
 // Grip and replaceable mount
 plug_major = 3.1;
 plug_minor = 2.65;
 plug_length = 4;
 plug_pitch = 1.2;
+smooth_diameter = 3.4;
 seat_diameter = 20;
 seat_dish = 0.9;
 mount_center = [0, -1];
@@ -104,13 +105,17 @@ module lid() {
     }
 }
 
+module smooth_pin(diameter) {
+    translate([0, 0, -eps])
+        cylinder(d = diameter, h = plug_length - 0.6 + eps);
+    translate([0, 0, plug_length - 0.6 - eps])
+        cylinder(d1 = diameter, d2 = diameter - 0.8, h = 0.6 + eps);
+}
+
 module gauge(diameter) {
     union() {
         cylinder(d = 14, h = 2.4);
-        translate([0, 0, 2.4 - eps])
-            cylinder(d = diameter, h = plug_length - 0.6 + eps);
-        translate([0, 0, 2.4 + plug_length - 0.6 - eps])
-            cylinder(d1 = diameter, d2 = diameter - 0.8, h = 0.6 + eps);
+        translate([0, 0, 2.4]) smooth_pin(diameter);
         translate([0, -3.9, 2.4 - eps])
             linear_extrude(0.42)
                 text(str(diameter), size = 2.7, font = "Liberation Sans",
@@ -146,7 +151,7 @@ module grip_thread() {
     polyhedron(points, faces, convexity = 8);
 }
 
-module mount() {
+module mount(threaded) {
     seat_height = 5.6;
     center_height = seat_height - seat_dish;
     union() {
@@ -159,12 +164,16 @@ module mount() {
             translate([0, 0, -eps]) cylinder(d = 6.65, h = 2.8 + eps, $fn = 6);
             translate([0, 0, -eps]) cylinder(d = 3.4, h = 4.0 + eps);
         }
-        translate([0, 0, center_height - eps]) grip_thread();
+        if (threaded)
+            translate([0, 0, center_height - eps]) grip_thread();
+        else
+            translate([0, 0, center_height]) smooth_pin(smooth_diameter);
     }
 }
 
 if (part == "tray") tray();
 else if (part == "lid") mirror([0, 1, 0]) lid();
-else if (part == "mount") mount();
+else if (part == "mount") mount(threaded = true);
+else if (part == "smooth_mount") mount(threaded = false);
 else if (part == "gauges")
     for (i = [0 : 4]) translate([17 * (i - 2), 0, 0]) gauge(2.6 + 0.2 * i);
